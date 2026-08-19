@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  realtime-api:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: realtime_api_p3
+    ports:
+      - "8002:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+
+  event-generator:
+    build:
+      context: ./mock_events
+      dockerfile: Dockerfile
+    container_name: event_generator_p3
+    environment:
+      - GATEWAY_URL=http://realtime-api:8000/api/v1/realtime/publish-event
+    depends_on:
+      - realtime-api
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+networks:
+  default:
+    name: net_pregunta_03

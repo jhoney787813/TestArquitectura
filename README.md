@@ -2,8 +2,8 @@
 
 **Postulante**: Jhon E. / Arquitecto Senior de Software  
 **Cuenta de GitHub**: [`jhoney787813`](https://github.com/jhoney787813)  
-**Repositorio**: [`https://github.com/jhoney787813/TestArquitectura`](https://github.com/jhoney787813/TestArquitectura)  
-**Metodología de Arquitectura**: **Why-Driven Design (WDD)** | **ISO/IEC 25010 Quality Attributes** | **Transactional Outbox & Resiliency Patterns**  
+**Repositorio Oficial**: [`https://github.com/jhoney787813/TestArquitectura`](https://github.com/jhoney787813/TestArquitectura)  
+**Metodología de Arquitectura**: **Why-Driven Design (WDD)** | **Modelo C4** | **ISO/IEC 25010 Quality Attributes** | **Apache Kafka & Resiliency Patterns**  
 
 ---
 
@@ -13,108 +13,124 @@ Estimado equipo evaluador y líderes técnicos del proceso de selección:
 
 Este repositorio contiene la solución práctica, documentada y desplegable del **Examen Técnico de Arquitectura de Software (`Prueba Técnica - FWK Architect.docx`)**. 
 
-A diferencia de propuestas puramente teóricas o conceptuales, cada ejercicio aquí presentado ha sido **construido como un proyecto funcional ejecutable en contenedores OCI (Podman / Docker)**, respaldado por **evidencia empírica en tiempo real**, **playbooks operacionales en Kubernetes**, **diagramas de componentes para Draw.io** y una **sustentación guiada por la metodología Why-Driven Design (WDD)**.
+Cada ejercicio propuesto ha sido **construido como un proyecto funcional ejecutable en contenedores OCI (Podman / Docker)**, respaldado por **evidencia empírica en tiempo real**, **playbooks operacionales en Kubernetes**, **diagramas NATIVOS para Draw.io (.drawio XML y .mmd Mermaid)**, **diagramas C4 Model** y una **sustentación guiada por la metodología Why-Driven Design (WDD)**.
 
-El objetivo de esta entrega es demostrar no solo el conocimiento de patrones avanzados de microservicios y resiliencia, sino la **experiencia práctica y *expertise* en el sector de arquitectura empresarial**, traduciendo decisiones técnicas complejas en valor de negocio medible, alta tolerancia a fallos y excelente comunicación técnica.
-
----
-
-## 📂 Navegación Estructurada por Ejercicios
-
-El repositorio se encuentra organizado de forma modular por carpetas independientes marcadas por cada pregunta (`pregunta_01/`, `pregunta_02/`, ...):
-
-```text
-TestArquitectura/
-├── README.md                   # Presentación general para el equipo de selección
-├── pregunta_01/                # Ejercicio 1: Diagnóstico de Performance (CPU 10%, RAM 30%, P95 8s)
-│   ├── app/                    # REST API simulada con bloqueo I/O Wait
-│   ├── mock_downstream/        # Servicio dependiente lento (8s)
-│   ├── load_test/              # Pruebas de carga en vivo y consola visual coloreada
-│   ├── kubernetes/             # Manifests Deployment/Service & Playbook kubectl
-│   ├── JUSTIFICACION_TECNICA.md# Sustentación técnica con la Analogía de las Ventanillas del Banco
-│   ├── GUION_SUSTENTACION.md   # Script listo para grabación ante cámara
-│   └── GUIA_PRUEBA_VIDEO.md    # Manual ejecutable paso a paso para el video
-│
-└── pregunta_02/                # Ejercicio 2: Patrones, Escalabilidad y Resiliencia (Emisión de Pólizas)
-    ├── app/                    # API REST con Transactional Outbox Pattern
-    ├── workers/                # Worker asíncrono con Exponential Backoff y DLQ
-    ├── mock_services/          # Gateways con Circuit Breaker (SMS) e ingesta OpenSearch Audit
-    ├── load_test/              # Script CLI interactivo para probar Escenarios A, B, C, D y E
-    ├── diagrams/               # Diagramas de Componentes (.drawio XML nativo y .mmd Mermaid)
-    ├── kubernetes/             # Manifests K8s & Comandos de verificación de resiliencia
-    ├── JUSTIFICACION_TECNICA.md# Sustentación Why-Driven Design (WDD) & ISO 25010
-    ├── GUION_SUSTENTACION.md   # Script para cámara con la Analogía del Tiquete de Avión
-    └── GUIA_PRUEBA_VIDEO.md    # Manual de demostración en vivo
-```
+El objetivo de esta entrega es demostrar no solo el conocimiento de patrones avanzados de microservicios y resiliencia, sino la **experiencia práctica y *expertise* en el sector de arquitectura empresarial distribuida**, traduciendo decisiones técnicas complejas en valor de negocio medible, alta tolerancia a fallos y excelente comunicación técnica.
 
 ---
 
-## 🛠️ Resumen de Ejercicios y Soluciones Técnicas
+## 🗺️ Índice Directo de Respuestas por Ejercicio y Pregunta
+
+Para facilitar la revisión por parte del comité evaluador, a continuación se detallan los enlaces directos a la respuesta, código fuente, diagramas de arquitectura y guiones de sustentación de cada ejercicio:
+
+---
 
 ### 🔴 Ejercicio 1: Diagnóstico de Performance (CPU 10%, RAM 30%, P95 = 8s)
-- **Problemática**: Una API REST consume solo 10% de CPU y 30% de RAM, pero su latencia P95 se dispara a 8 segundos.
-- **Diagnóstico del Arquitecto**: Se descarta falta de procesador o memory leak. El sistema sufre de **I/O Wait / Thread Pool Starvation / Connection Pool Exhaustion**. Los hilos están en estado `WAITING` retenidos en sockets de red.
-- **Demostración Práctica**: En `pregunta_01/` se despliega la API en Podman y se ejecuta `./load_test/run_visual_demo.sh`. Se comprueba empíricamente CPU al ~2%, RAM al ~44% y latencia de 8.17s.
-- **Solución Aplicada**: En la misma consola se demuestra la opción optimizada con I/O Asíncrono no bloqueante y Caché Redis, **reduciendo la latencia de 8.17s a solo 15 milisegundos (>1,000x más rápido)**.
-- **Documentos Clave**:
-  - [Justificación Técnica Ejercicio 1](pregunta_01/JUSTIFICACION_TECNICA.md)
-  - [Guión para Cámara - Analogía del Banco](pregunta_01/GUION_SUSTENTACION.md)
-  - [Guía de Diagnóstico en Kubernetes](pregunta_01/kubernetes/KUBERNETES_DIAGNOSTICO.md)
+
+- **Pregunta Abordada**: *¿Qué investigaría si una API REST consume CPU 10%, RAM 30% y P95 es de 8 segundos?*
+- 📄 **Respuesta & Justificación Técnica**: [`pregunta_01/JUSTIFICACION_TECNICA.md`](pregunta_01/JUSTIFICACION_TECNICA.md)  
+  *(Explicación con la **Analogía de las Ventanillas del Banco**: I/O Wait, Thread Pool Starvation y Connection Pool Exhaustion)*
+- 🎬 **Guión de Sustentación para Cámara**: [`pregunta_01/GUION_SUSTENTACION.md`](pregunta_01/GUION_SUSTENTACION.md)
+- 📹 **Guía Paso a Paso para Grabación de Video**: [`pregunta_01/GUIA_PRUEBA_VIDEO.md`](pregunta_01/GUIA_PRUEBA_VIDEO.md)
+- 📊 **Playbook de Diagnóstico en Kubernetes**: [`pregunta_01/kubernetes/KUBERNETES_DIAGNOSTICO.md`](pregunta_01/kubernetes/KUBERNETES_DIAGNOSTICO.md) y [`pregunta_01/kubernetes/diagnostic_commands.sh`](pregunta_01/kubernetes/diagnostic_commands.sh)
+- 🖥️ **Script de Demostración Visual (ANTES vs DESPUÉS)**: [`pregunta_01/load_test/run_visual_demo.sh`](pregunta_01/load_test/run_visual_demo.sh)  
+  *(Demuestra la caída de latencia de 8.17s a **15 milisegundos**, una mejora de **> 1,000x**)*
+- 💻 **Código Fuente y Despliegue en Podman**:
+  - API REST Simulada: [`pregunta_01/app/main.py`](pregunta_01/app/main.py)
+  - Servicio Downstream Lento: [`pregunta_01/mock_downstream/server.py`](pregunta_01/mock_downstream/server.py)
+  - Orquestador Compose: [`pregunta_01/docker-compose.yml`](pregunta_01/docker-compose.yml)
 
 ---
 
-### 🛡️ Ejercicio 2: Patrones, Escalabilidad y Resiliencia (Emisión de Póliza)
-- **Problemática**: Diseñar la emisión de una póliza que requiere actualizar BD, enviar Email, enviar SMS y generar Auditoría, evaluando qué ocurre ante fallas en cada componente (Preguntas A, B, C, D y E).
-- **Enfoque de Arquitectura**: **Metodología Why-Driven Design (WDD)** + **Transactional Outbox Pattern** + **Event-Driven Architecture (EDA)**.
-- **Respuestas a los Escenarios Evaluados**:
-  - **A) Diseño de Emisión**: Transacción ACID local guarda Póliza + Auditoría Local + Evento Outbox en la misma BD relacional. Respuesta HTTP al cliente en **< 50ms (0.23ms comprobado)**.
-  - **B) Si `SavePolicy` falla**: **Rollback ACID completo**. Ninguna póliza se crea, ningún evento se genera, ningún email/SMS es enviado (Consistencia del 100%).
-  - **C) Si `SendEmail` falla**: La Póliza **permanece emitida de forma segura**. El worker asíncrono reintenta con *Exponential Backoff* y desplaza el correo a la **Dead Letter Queue (DLQ)**.
-  - **D) Si SMS está caído**: Un **Circuit Breaker** commuta a estado `OPEN` (*fail-fast*) y desvía la notificación hacia un **Fallback Push**. La emisión de la póliza jamás se bloquea.
-  - **E) Si Audit falla & Persistencia**: **Auditoría Dual**. Auditoría local ACID en la BD relacional protege legalmente a la empresa. Auditoría centralizada en **ElasticSearch / OpenSearch** por inmutabilidad *Append-Only* y búsqueda JSON distribuida.
-- **Documentos y Diagramas Clave**:
-  - [Justificación WDD y Trade-offs ISO 25010](pregunta_02/JUSTIFICACION_TECNICA.md)
-  - [Guión para Cámara - Analogía del Tiquete de Avión](pregunta_02/GUION_SUSTENTACION.md)
-  - [Diagrama de Componentes NATIVO para Draw.io XML](pregunta_02/diagrams/component_architecture.drawio)
-  - [Diagrama de Componentes Mermaid](pregunta_02/diagrams/component_architecture.mmd)
+### 🛡️ Ejercicio 2: Patrones, Escalabilidad y Resiliencia (Emisión de Pólizas)
+
+- **Preguntas Abordadas**:
+  - **A)** *Realice el diseño más conveniente para la emisión de una póliza (DB, Email, SMS, Audit)*
+  - **B)** *¿Qué pasa si SavePolicy falla?*
+  - **C)** *¿Qué pasa si SendEmail falla?*
+  - **D)** *¿Qué pasa si SMS está caído?*
+  - **E)** *¿Qué pasa si Audit falla? ¿Dónde persistiría AuditService?*
+- 📄 **Respuestas Detalladas A-E & Sustentación WDD**: [`pregunta_02/JUSTIFICACION_TECNICA.md`](pregunta_02/JUSTIFICACION_TECNICA.md)  
+  *(Metodología **Why-Driven Design (WDD)**, **Analogía del Tiquete de Avión**, Atributos ISO/IEC 25010 y Matriz de Trade-offs)*
+- 🎨 **Diagrama de Arquitectura de Componentes para Draw.io**:
+  - Archivo XML Nativo para Draw.io: [`pregunta_02/diagrams/component_architecture.drawio`](pregunta_02/diagrams/component_architecture.drawio)
+  - Código Mermaid Importable: [`pregunta_02/diagrams/component_architecture.mmd`](pregunta_02/diagrams/component_architecture.mmd)
+- 🎬 **Guión de Sustentación para Cámara**: [`pregunta_02/GUION_SUSTENTACION.md`](pregunta_02/GUION_SUSTENTACION.md)
+- 📹 **Guía Paso a Paso para Grabación de Video**: [`pregunta_02/GUIA_PRUEBA_VIDEO.md`](pregunta_02/GUIA_PRUEBA_VIDEO.md)
+- 📊 **Playbook de Diagnóstico en Kubernetes**: [`pregunta_02/kubernetes/KUBERNETES_DIAGNOSTICO.md`](pregunta_02/kubernetes/KUBERNETES_DIAGNOSTICO.md) y [`pregunta_02/kubernetes/diagnostic_commands.sh`](pregunta_02/kubernetes/diagnostic_commands.sh)
+- 🖥️ **Script CLI Interactivo de Demostración (Escenarios A, B, C, D y E)**: [`pregunta_02/load_test/run_visual_demo.sh`](pregunta_02/load_test/run_visual_demo.sh)
+- 💻 **Código Fuente y Despliegue en Podman**:
+  - API Transactional Outbox: [`pregunta_02/app/main.py`](pregunta_02/app/main.py)
+  - Worker Asíncrono (Retries + DLQ): [`pregunta_02/workers/notification_worker.py`](pregunta_02/workers/notification_worker.py)
+  - Gateways con Circuit Breaker & OpenSearch: [`pregunta_02/mock_services/external_gateways.py`](pregunta_02/mock_services/external_gateways.py)
+  - Orquestador Compose: [`pregunta_02/docker-compose.yml`](pregunta_02/docker-compose.yml)
+
+---
+
+### ⚡ Ejercicio 3: Real Time Architecture (Emisión, Inspección, Siniestros)
+
+- **Pregunta Abordada**: *¿Cómo implementaría la solución técnica en tiempo real para mostrar el estado de Emisión, Inspección y Siniestros? Debe discutir WebSockets, SignalR, SSE, Polling y explicar Trade-offs.*
+- 📄 **Respuesta & Sustentación WDD**: [`pregunta_03/JUSTIFICACION_TECNICA.md`](pregunta_03/JUSTIFICACION_TECNICA.md)  
+  *(Metodología **Why-Driven Design (WDD)**, **Analogía de Uber / Domino's Pizza Tracker**, **Apache Kafka Event Backbone**, **SignalR Hubs / SSE Gateway** y **Redis Pub/Sub Backplane**)*
+- 📐 **Diagrama C4 Model Nivel 2 (Container Diagram) para Draw.io**:
+  - Archivo XML Nativo C4 Model para Draw.io: [`pregunta_03/diagrams/c4_model_realtime_architecture.drawio`](pregunta_03/diagrams/c4_model_realtime_architecture.drawio)
+  - Código C4 Model Mermaid Importable: [`pregunta_03/diagrams/c4_model_realtime_architecture.mmd`](pregunta_03/diagrams/c4_model_realtime_architecture.mmd)
+- 🎬 **Guión de Sustentación para Cámara**: [`pregunta_03/GUION_SUSTENTACION.md`](pregunta_03/GUION_SUSTENTACION.md)
+- 📹 **Guía Paso a Paso para Grabación de Video**: [`pregunta_03/GUIA_PRUEBA_VIDEO.md`](pregunta_03/GUIA_PRUEBA_VIDEO.md)
+- 📊 **Playbook de Diagnóstico en Kubernetes**: [`pregunta_03/kubernetes/KUBERNETES_DIAGNOSTICO.md`](pregunta_03/kubernetes/KUBERNETES_DIAGNOSTICO.md) y [`pregunta_03/kubernetes/diagnostic_commands.sh`](pregunta_03/kubernetes/diagnostic_commands.sh)
+- 🖥️ **Script de Demostración SSE / WebSockets en Tiempo Real**: [`pregunta_03/load_test/run_visual_demo.sh`](pregunta_03/load_test/run_visual_demo.sh)  
+  *(Transmisión continua de eventos de Emisión, Inspección y Siniestros sin refrescar la pantalla)*
+- 💻 **Código Fuente y Despliegue en Podman**:
+  - Real-Time Gateway API (SSE, WebSockets, SignalR): [`pregunta_03/app/main.py`](pregunta_03/app/main.py)
+  - Generador de Eventos Distribuidos Kafka: [`pregunta_03/mock_events/event_generator.py`](pregunta_03/mock_events/event_generator.py)
+  - Orquestador Compose: [`pregunta_03/docker-compose.yml`](pregunta_03/docker-compose.yml)
 
 ---
 
 ## 🚀 Guía Rápida de Ejecución Práctica en Podman / Docker
 
-Para verificar el funcionamiento en vivo de cualquiera de los ejercicios en tu máquina local:
+Todos los ejercicios pueden ejecutarse de manera independiente y en simultáneo sin conflictos de puertos:
 
-### Para probar el Ejercicio 1 (Diagnóstico de Performance):
+### Para probar el Ejercicio 1 (Diagnóstico de Performance - Puerto 8000):
 ```bash
 cd pregunta_01
 podman compose up -d --build
 ./load_test/run_visual_demo.sh
 ```
 
-### Para probar el Ejercicio 2 (Resiliencia y Outbox Pattern):
+### Para probar el Ejercicio 2 (Resiliencia y Outbox Pattern - Puerto 8001):
 ```bash
 cd pregunta_02
 podman compose up -d --build
 ./load_test/run_visual_demo.sh
 ```
 
----
-
-## 🎨 Cómo visualizar el Diagrama de Arquitectura en Draw.io
-
-1. Abre **[app.diagrams.net](https://app.diagrams.net)** en tu navegador.
-2. Haz clic en **Abrir diagrama existente** y selecciona el archivo de este repositorio:  
-   `pregunta_02/diagrams/component_architecture.drawio`
-3. O bien, en Draw.io ve a **Organizar -> Insertar -> Avanzado -> Mermaid** y pega el contenido del archivo `pregunta_02/diagrams/component_architecture.mmd`.
+### Para probar el Ejercicio 3 (Real Time Architecture - Puerto 8002):
+```bash
+cd pregunta_03
+podman compose up -d --build
+./load_test/run_visual_demo.sh
+```
 
 ---
 
-## 🎯 Criterios de Calidad y Compromisos (Trade-offs)
+## 🎨 Cómo visualizar los Diagramas en Draw.io (diagrams.net)
+
+1. Abre **[app.diagrams.net](https://app.diagrams.net)** en tu navegador web.
+2. Selecciona **"Abrir diagrama existente"** y selecciona cualquiera de los archivos del repositorio:
+   - Diagrama de Componentes Ejercicio 2: `pregunta_02/diagrams/component_architecture.drawio`
+   - Diagrama C4 Model Ejercicio 3: `pregunta_03/diagrams/c4_model_realtime_architecture.drawio`
+3. *Método Alternativo*: En Draw.io ve a **Organizar -> Insertar -> Avanzado -> Mermaid** y pega el contenido del archivo `.mmd` correspondiente.
+
+---
+
+## 🎯 Atributos de Calidad ISO/IEC 25010 y Compromisos (Trade-offs)
 
 Bajo la norma **ISO/IEC 25010**, los proyectos destacan los siguientes compromisos asumidos:
 
-- **Consistencia Eventual vs. Consistencia Fuerte Inmediata**: Aceptamos consistencia eventual de segundos en canales de notificación (Email/SMS) a cambio de garantizar la respuesta HTTP en milisegundos y un SLA de disponibilidad del 99.99%.
+- **Consistencia Eventual vs. Consistencia Fuerte Inmediata**: Aceptamos consistencia eventual de segundos en canales de notificación (Email/SMS) a cambio de garantizar la respuesta HTTP en **0.23 ms** y un SLA de disponibilidad del 99.99%.
 - **Tolerancia a Fallos vs. Complejidad Operativa**: Incurrimos en administrar workers asíncronos y colas DLQ a cambio de aislar completamente el core del negocio de caídas en proveedores de terceros.
+- **Server-Sent Events vs WebSockets**: SSE es seleccionado para dashboards de monitoreo en tiempo real por su ligereza HTTP/2 nativa, reconexión automática y facilidad para atravesar proxies corporativos.
 
 ---
-*Repositorio creado y mantenido por Jhon E. para el proceso de selección de Arquitecto de Software.*
+*Repositorio creado, mantenido y sustentado por Jhon E. para el proceso de selección de Arquitecto de Software.*

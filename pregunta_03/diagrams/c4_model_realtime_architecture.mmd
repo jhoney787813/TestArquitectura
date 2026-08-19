@@ -1,0 +1,39 @@
+graph TB
+    subgraph Users ["1. ACTORES Y PERSONAS"]
+        User["Persona: Cliente / Perito / Asegurado<br>Visualiza estados de Emisión, Inspección y Siniestros"]
+    end
+
+    subgraph SystemBoundary ["2. C4 SYSTEM BOUNDARY: ARQUITECTURA EN TIEMPO REAL"]
+        SPA["Container: Single Page App / Mobile<br>(React / Flutter Dashboard)<br>Suscrito a eventos en tiempo real"]
+        
+        Gateway["Container: Real-Time SignalR & SSE Gateway<br>(.NET SignalR / FastAPI Hub)<br>Mantiene conexiones SSE (HTTP/2) y WebSockets (TCP)"]
+        
+        Redis[("Container: Redis Pub/Sub Backplane<br>(Redis Cluster v7.0)<br>Sincronización multi-nodo de hubs de SignalR")]
+        
+        Kafka[("Container: Apache Kafka Event Backbone<br>Topics: policy-events, inspection-events, claims-events<br>Event stream ordenado de alta concurrencia")]
+    end
+
+    subgraph Producers ["3. CORE PRODUCER SERVICES"]
+        SvcEmision["Policy Emission Service"]
+        SvcInspeccion["Inspection Service"]
+        SvcSiniestros["Claims & Incidents Service"]
+    end
+
+    User -->|Visualiza Dashboard| SPA
+    SPA -->|Suscripción SSE / WebSockets| Gateway
+    Gateway <-->|Backplane Pub/Sub| Redis
+    Kafka -->|Consumer Group Stream| Gateway
+
+    SvcEmision -->|Publica: POLICY_EMITTED| Kafka
+    SvcInspeccion -->|Publica: INSPECTOR_ON_WAY| Kafka
+    SvcSiniestros -->|Publica: CLAIM_FILED| Kafka
+
+    classDef c4User fill:#08427b,stroke:#073866,fontColor:#ffffff;
+    classDef c4Container fill:#1168bd,stroke:#0e5296,fontColor:#ffffff;
+    classDef c4Db fill:#85bbf0,stroke:#0e5296,fontColor:#000000;
+    classDef c4Producer fill:#2b7bba,stroke:#0e5296,fontColor:#ffffff;
+
+    class User c4User;
+    class SPA,Gateway c4Container;
+    class Redis,Kafka c4Db;
+    class SvcEmision,SvcInspeccion,SvcSiniestros c4Producer;

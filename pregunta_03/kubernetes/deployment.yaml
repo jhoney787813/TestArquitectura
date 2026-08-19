@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: realtime-api-deployment
+  namespace: default
+  labels:
+    app: realtime-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: realtime-api
+  template:
+    metadata:
+      labels:
+        app: realtime-api
+    spec:
+      containers:
+      - name: realtime-api
+        image: realtime-api:v3.0
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-generator-deployment
+  namespace: default
+  labels:
+    app: event-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-generator
+  template:
+    metadata:
+      labels:
+        app: event-generator
+    spec:
+      containers:
+      - name: event-generator
+        image: event-generator:v3.0
+        env:
+        - name: GATEWAY_URL
+          value: "http://realtime-api-service:8000/api/v1/realtime/publish-event"
