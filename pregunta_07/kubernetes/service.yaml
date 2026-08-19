@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cqrs-mediator-api-service
+  namespace: default
+  labels:
+    app: cqrs-mediator-api
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+  selector:
+    app: cqrs-mediator-api

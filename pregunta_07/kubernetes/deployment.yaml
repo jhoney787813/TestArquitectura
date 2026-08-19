@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cqrs-mediator-api-deployment
+  namespace: default
+  labels:
+    app: cqrs-mediator-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cqrs-mediator-api
+  template:
+    metadata:
+      labels:
+        app: cqrs-mediator-api
+    spec:
+      containers:
+      - name: cqrs-mediator-api
+        image: cqrs-mediator-api:v7.0
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"

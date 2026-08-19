@@ -1,0 +1,36 @@
+graph TB
+    subgraph Users ["1. ACTORES Y PRESENTACIÓN"]
+        User["Persona: Cliente / API Client<br>Envía Commands (Modificaciones) y Queries (Consultas)"]
+    end
+
+    subgraph SystemBoundary ["2. C4 SYSTEM BOUNDARY: ARQUITECTURA CQRS & PATRÓN MEDIATOR"]
+        Mediator["Container: MediatR Mediator Bus (.NET 9)<br>(Pipeline Behaviors: ValidationBehavior & LoggingBehavior)"]
+        
+        subgraph WriteStack ["3. PILA DE ESCRITURA (COMMAND STACK - WRITE MODEL)"]
+            CmdHandlers["Component: Command Handlers<br>(CreatePolicyCommandHandler & EmitPolicyCommandHandler)"]
+            WriteDB[("Database: Master Write DB (PostgreSQL)<br>(Modelo Normalizado 3NF - ACID Transactions)")]
+        end
+
+        subgraph ReadStack ["4. PILA DE LECTURA (QUERY STACK - READ MODEL)"]
+            QueryHandlers["Component: Query Handlers<br>(GetPolicyByIdQueryHandler & SummaryQueryHandler)"]
+            ReadDB[("Database: Read Replicas / Redis Cache<br>(Proyecciones DTO Denormalizadas - Latencia < 2ms)")]
+        end
+    end
+
+    User -->|Envía Requests HTTP| Mediator
+    Mediator -->|Despacha Commands| CmdHandlers
+    Mediator -->|Despacha Queries| QueryHandlers
+
+    CmdHandlers -->|Persiste Entidades ACID| WriteDB
+    QueryHandlers -->|Consultas DTO Directas| ReadDB
+
+    WriteDB -.->|Sincronización Asíncrona (Eventual Consistency)| ReadDB
+
+    classDef c4User fill:#08427b,stroke:#073866,fontColor:#ffffff;
+    classDef c4Container fill:#1168bd,stroke:#0e5296,fontColor:#ffffff;
+    classDef c4Db fill:#85bbf0,stroke:#0e5296,fontColor:#000000;
+    classDef c4Producer fill:#2b7bba,stroke:#0e5296,fontColor:#ffffff;
+
+    class User c4User;
+    class Mediator,CmdHandlers,QueryHandlers c4Container;
+    class WriteDB,ReadDB c4Db;

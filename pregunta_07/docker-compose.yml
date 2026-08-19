@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  cqrs-mediator-api:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: cqrs_mediator_api_p7
+    ports:
+      - "8007:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+
+networks:
+  default:
+    name: net_pregunta_07

@@ -3,7 +3,7 @@
 **Postulante**: Jhon E. / Arquitecto Senior de Software  
 **Cuenta de GitHub**: [`jhoney787813`](https://github.com/jhoney787813)  
 **Repositorio Oficial**: [`https://github.com/jhoney787813/TestArquitectura`](https://github.com/jhoney787813/TestArquitectura)  
-**Metodología de Arquitectura**: **Why-Driven Design (WDD)** | **Modelo C4** | **Clean Architecture (.NET 9)** | **Pipeline Behaviors (MediatR CQRS)** | **Performance Engineering (500 TPS)** | **ISO/IEC 25010**  
+**Metodología de Arquitectura**: **Why-Driven Design (WDD)** | **Modelo C4** | **Clean Architecture (.NET 9)** | **CQRS & Patrón Mediator (MediatR)** | **Pipeline Behaviors** | **Performance Engineering (500 TPS)** | **ISO/IEC 25010**  
 
 ---
 
@@ -13,9 +13,9 @@ Estimado equipo evaluador y líderes técnicos del proceso de selección:
 
 Este repositorio contiene la solución práctica, documentada y desplegable del **Examen Técnico de Arquitectura de Software (`Prueba Técnica - FWK Architect.docx`)**. 
 
-Cada uno de los **6 Ejercicios Propuestos** ha sido **construido y sustentado técnicamente bajo estándares de arquitectura empresarial**, respaldado por **evidencia empírica en tiempo real**, **playbooks operacionales en Kubernetes**, **diagramas NATIVOS para Draw.io (.drawio XML y .mmd Mermaid)**, **diagramas C4 Model** y una **sustentación guiada por la metodología Why-Driven Design (WDD)**.
+Cada uno de los **7 Ejercicios Propuestos** ha sido **construido y sustentado técnicamente bajo estándares de arquitectura empresarial**, respaldado por **evidencia empírica en tiempo real**, **playbooks operacionales en Kubernetes**, **diagramas NATIVOS para Draw.io (.drawio XML y .mmd Mermaid)**, **diagramas C4 Model** y una **sustentación guiada por la metodología Why-Driven Design (WDD)**.
 
-El objetivo de esta entrega es demostrar no solo el conocimiento de patrones avanzados de microservicios, resiliencia, observabilidad, ingeniería de rendimiento y seguridad distribuida, sino la **experiencia práctica y *expertise* en el sector de arquitectura empresarial**, traduciendo decisiones técnicas complejas en valor de negocio medible, alta tolerancia a fallos y excelente comunicación técnica.
+El objetivo de esta entrega es demostrar no solo el conocimiento de patrones avanzados de microservicios, resiliencia, observabilidad, CQRS, patrón mediator, ingeniería de rendimiento y seguridad distribuida, sino la **experiencia práctica y *expertise* en el sector de arquitectura empresarial**, traduciendo decisiones técnicas complejas en valor de negocio medible, alta tolerancia a fallos y excelente comunicación técnica.
 
 ---
 
@@ -141,16 +141,103 @@ Para facilitar la revisión por parte del comité evaluador, a continuación se 
 
 ---
 
+### 🔀 Ejercicio 7: Patrón CQRS y Mediator en .NET 9 (Command Query Responsibility Segregation)
+
+- **Pregunta Abordada**: *Ejecute la arquitectura implementando CQRS y el patrón Mediator para la pregunta 7, realice el análisis y justifique la implementación.*
+- 📄 **Respuestas & Sustentación WDD**: [`pregunta_07/JUSTIFICACION_TECNICA.md`](pregunta_07/JUSTIFICACION_TECNICA.md)  
+  *(Metodología **Why-Driven Design (WDD)**, **Analogía de la Cocina del Restaurante (Chef vs Mesero)**, **Clean Architecture (.NET 9)**, **MediatR Pipeline Behaviors**, **Read/Write Models Separados** y **Consistencia Eventual**)*
+- 📐 **Diagrama C4 Model Nivel 2 (Container Diagram) para Draw.io**:
+  - Archivo XML Nativo C4 Model para Draw.io: [`pregunta_07/diagrams/cqrs_mediator_architecture.drawio`](pregunta_07/diagrams/cqrs_mediator_architecture.drawio)
+  - Código C4 Model Mermaid Importable: [`pregunta_07/diagrams/cqrs_mediator_architecture.mmd`](pregunta_07/diagrams/cqrs_mediator_architecture.mmd)
+- 🎬 **Guión de Sustentación para Cámara**: [`pregunta_07/GUION_SUSTENTACION.md`](pregunta_07/GUION_SUSTENTACION.md)
+- 📹 **Guía Paso a Paso para Grabación de Video**: [`pregunta_07/GUIA_PRUEBA_VIDEO.md`](pregunta_07/GUIA_PRUEBA_VIDEO.md)
+- 📊 **Playbook de Diagnóstico en Kubernetes**: [`pregunta_07/kubernetes/KUBERNETES_DIAGNOSTICO.md`](pregunta_07/kubernetes/KUBERNETES_DIAGNOSTICO.md) y [`pregunta_07/kubernetes/diagnostic_commands.sh`](pregunta_07/kubernetes/diagnostic_commands.sh)
+- 🖥️ **Script CLI de Demostración Visual (Comandos vs Consultas en Vivo)**: [`pregunta_07/load_test/run_visual_demo.sh`](pregunta_07/load_test/run_visual_demo.sh)
+- 💻 **Código Fuente y Despliegue en Podman**:
+  - API CQRS & Mediator Bus (.NET 9 / FastAPI): [`pregunta_07/app/main.py`](pregunta_07/app/main.py)
+  - Orquestador Compose: [`pregunta_07/docker-compose.yml`](pregunta_07/docker-compose.yml)
+
+---
+
+## 🚀 Guía Rápida de Ejecución Práctica en Podman / Docker
+
+Todos los 7 ejercicios pueden ejecutarse de manera independiente y en simultáneo sin conflictos de puertos:
+
+### Para probar el Ejercicio 1 (Diagnóstico de Performance - Puerto 8000):
+```bash
+cd pregunta_01
+podman compose up -d --build
+./load_test/run_visual_demo.sh
+```
+
+### Para probar el Ejercicio 2 (Resiliencia y Outbox Pattern - Puerto 8001):
+```bash
+cd pregunta_02
+podman compose up -d --build
+./load_test/run_visual_demo.sh
+```
+
+### Para probar el Ejercicio 3 (Real Time Architecture - Puerto 8002):
+```bash
+cd pregunta_03
+podman compose up -d --build
+./load_test/run_visual_demo.sh
+```
+
+### Para probar el Ejercicio 4 (Seguridad Multi-Protocolo - Puertos 8003 y 8084):
+```bash
+cd pregunta_04
+podman compose up -d --build
+./load_test/run_visual_demo.sh
+# O abre en tu navegador el cliente interactivo: http://localhost:8084
+```
+
+### Para probar el Ejercicio 5 (Observabilidad y Pipeline Behavior - Puerto 8005):
+```bash
+cd pregunta_05
+podman compose up -d --build
+./load_test/run_visual_demo.sh
+```
+
+### Para probar el Ejercicio 6 (Performance Engineering 100 a 500 TPS):
+```bash
+cd pregunta_06
+cat JUSTIFICACION_TECNICA.md
+```
+
+### Para probar el Ejercicio 7 (CQRS & Patrón Mediator .NET 9 - Puerto 8007):
+```bash
+cd pregunta_07
+podman compose up -d --build
+./load_test/run_visual_demo.sh
+```
+
+---
+
+## 🎨 Cómo visualizar los Diagramas en Draw.io (diagrams.net)
+
+1. Abre **[app.diagrams.net](https://app.diagrams.net)** en tu navegador web.
+2. Selecciona **"Abrir diagrama existente"** y selecciona cualquiera de los archivos del repositorio:
+   - Diagrama de Componentes Ejercicio 2: `pregunta_02/diagrams/component_architecture.drawio`
+   - Diagrama C4 Model Ejercicio 3: `pregunta_03/diagrams/c4_model_realtime_architecture.drawio`
+   - Diagrama C4 Model Ejercicio 4: `pregunta_04/diagrams/c4_security_architecture.drawio`
+   - Diagrama C4 Model Ejercicio 5: `pregunta_05/diagrams/c4_observability_architecture.drawio`
+   - Diagrama C4 Model Ejercicio 7: `pregunta_07/diagrams/cqrs_mediator_architecture.drawio`
+3. *Método Alternativo*: En Draw.io ve a **Organizar -> Insertar -> Avanzado -> Mermaid** y pega el contenido del archivo `.mmd` correspondiente.
+
+---
+
 ## 🎯 Atributos de Calidad ISO/IEC 25010 y Compromisos (Trade-offs)
 
 Bajo la norma **ISO/IEC 25010**, los proyectos destacan los siguientes compromisos asumidos:
 
-- **Consistencia Eventual vs. Consistencia Fuerte Inmediata**: Aceptamos consistencia eventual de segundos en canales de notificación (Email/SMS) a cambio de garantizar la respuesta HTTP en **0.23 ms** y un SLA de disponibilidad del 99.99%.
+- **Consistencia Eventual vs. Consistencia Fuerte Inmediata**: Aceptamos consistencia eventual de segundos en canales de notificación (Email/SMS) y proyecciones de lectura a cambio de garantizar respuestas en **0.23 ms** y un SLA de disponibilidad del 99.99%.
 - **Tolerancia a Fallos vs. Complejidad Operativa**: Incurrimos en administrar workers asíncronos y colas DLQ a cambio de aislar completamente el core del negocio de caídas en proveedores de terceros.
 - **Server-Sent Events vs WebSockets**: SSE es seleccionado para dashboards de monitoreo en tiempo real por su ligereza HTTP/2 nativa, reconexión automática y facilidad para atravesar proxies corporativos.
 - **Validación estatutaria (RS256) vs Consulta a BD en Seguridad**: Usamos tokens JWT RS256 de validación local y una **Redis Token Blacklist con TTL** para verificar revocaciones en **< 1ms**, evitando sobrecargar la BD relacional en cada petición HTTP/SOAP/WS.
 - **Centralización via Pipeline Behavior vs Try-Catch en Controladores**: Usamos Pipeline Behaviors en MediatR CQRS para interceptar excepciones sin duplicar código en controladores, aceptando una ligera sobrecarga CPU (< 1%) por instrumentación OpenTelemetry a cambio de un MTTR de minutos.
 - **Caching Distribuido vs Escalado Vertical Ciego de BD**: Incurrimos en administrar Redis Caching con TTL a cambio de reducir el 80% de lecturas a la BD relacional y lograr pasar de 100 TPS a 500 TPS con latencias P95 < 50ms.
+- **Desacoplamiento MediatR CQRS vs CRUD Monolítico**: Incurrimos en separar Commands y Queries en clases específicas a cambio de permitir lecturas ultrarrápidas (< 2ms) y escalado independiente de la base de datos de lectura.
 
 ---
 *Repositorio creado, mantenido y sustentado por Jhon E. para el proceso de selección de Arquitecto de Software.*

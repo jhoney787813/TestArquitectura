@@ -1,0 +1,70 @@
+<mxfile host="app.diagrams.net" modified="2026-08-19T18:11:00.000Z" agent="Antigravity Senior Architect" version="21.0.0" type="device">
+  <diagram id="c4-cqrs-mediator-arch" name="C4 Model Level 2 - Container Diagram CQRS & Mediator Architecture">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1100" math="0" shadow="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- C4 BOUNDARY -->
+        <mxCell id="c4_boundary" value="Sistema de Emisión de Pólizas - Arquitectura CQRS &amp; Patrón Mediator (.NET 9)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#000000;fontStyle=1;fontSize=16;startSize=40;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1720" height="980" as="geometry" />
+        </mxCell>
+
+        <!-- PERSONS / ACTORS -->
+        <mxCell id="actor_user" value="&lt;b&gt;[Person]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Cliente / Sistema Integrador&lt;/b&gt;&lt;br&gt;&lt;i&gt;Envía Commands (Escritura) y Queries (Lectura)&lt;/i&gt;" style="html=1;whiteSpace=wrap;fillColor=#08427b;strokeColor=#073866;fontColor=#ffffff;shape=mxgraph.c4.person;align=center;fontSize=12;" vertex="1" parent="c4_boundary">
+          <mxGeometry x="40" y="100" width="220" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- MEDIATOR BUS CONTAINER -->
+        <mxCell id="c4_mediator" value="&lt;b&gt;[Container: In-Memory Message Bus]&lt;/b&gt;&lt;br&gt;&lt;b&gt;MediatR Mediator Engine (.NET 9)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Pipeline Behaviors: ValidationBehavior &amp; LoggingBehavior&lt;/i&gt;&lt;br&gt;Desacopla emisores de receptores e intercepta cross-cutting concerns" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="c4_boundary">
+          <mxGeometry x="340" y="100" width="460" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- COMMAND STACK (WRITE MODEL) -->
+        <mxCell id="c4_command_stack" value="PILA DE ESCRITURA (COMMAND STACK - WRITE MODEL)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=#495057;fontStyle=1;fontSize=14;startSize=35;" vertex="1" parent="c4_boundary">
+          <mxGeometry x="40" y="320" width="760" height="580" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cmd_handlers" value="&lt;b&gt;[Component: Command Handlers]&lt;/b&gt;&lt;br&gt;&lt;b&gt;CreatePolicyCommandHandler / EmitPolicyCommandHandler&lt;/b&gt;&lt;br&gt;&lt;i&gt;Ejecuta lógica de dominio rica, validaciones ACID y reglas estatutarias&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b7bba;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;" vertex="1" parent="c4_command_stack">
+          <mxGeometry x="60" y="70" width="640" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="write_db" value="&lt;b&gt;[Database: Write Model Database]&lt;/b&gt;&lt;br&gt;&lt;b&gt;PostgreSQL / SQL Server Master&lt;/b&gt;&lt;br&gt;&lt;i&gt;Normalizada (3NF) - Garantiza Consistencia ACID&lt;/i&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#85bbf0;strokeColor=#0e5296;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="c4_command_stack">
+          <mxGeometry x="170" y="270" width="420" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- QUERY STACK (READ MODEL) -->
+        <mxCell id="c4_query_stack" value="PILA DE LECTURA (QUERY STACK - READ MODEL)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=#495057;fontStyle=1;fontSize=14;startSize=35;" vertex="1" parent="c4_boundary">
+          <mxGeometry x="880" y="320" width="780" height="580" as="geometry" />
+        </mxCell>
+
+        <mxCell id="query_handlers" value="&lt;b&gt;[Component: Query Handlers]&lt;/b&gt;&lt;br&gt;&lt;b&gt;GetPolicyByIdQueryHandler / GetSummaryQueryHandler&lt;/b&gt;&lt;br&gt;&lt;i&gt;Lectura directa DTO hiper-rápida (Bypasea Entidades de Dominio)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6c757d;strokeColor=#343a40;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="c4_query_stack">
+          <mxGeometry x="60" y="70" width="660" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="read_db" value="&lt;b&gt;[Database: Read Model &amp; Redis Cache]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Read Replicas / Redis Memory Store&lt;/b&gt;&lt;br&gt;&lt;i&gt;Denormalizada / Proyecciones DTO - Respuestas &lt; 2ms&lt;/i&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#85bbf0;strokeColor=#0e5296;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="c4_query_stack">
+          <mxGeometry x="180" y="270" width="420" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- FLECHA DE EVENTUAL CONSISTENCY (SYNCHRONIZATION) -->
+        <mxCell id="f_sync" value="Eventual Consistency (Sincronización Asíncrona de Proyecciones)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#d9534f;dashed=1;" edge="1" parent="c4_boundary" source="write_db" target="read_db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- FLECHAS DE CONEXIÓN -->
+        <mxCell id="f1" value="Envía Commands &amp; Queries" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#08427b;" edge="1" parent="c4_boundary" source="actor_user" target="c4_mediator">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f2" value="Despacha Commands" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2b7bba;" edge="1" parent="c4_boundary" source="c4_mediator" target="cmd_handlers">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f3" value="Despacha Queries" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6c757d;" edge="1" parent="c4_boundary" source="c4_mediator" target="query_handlers">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
