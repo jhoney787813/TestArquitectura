@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-rest-service
+  namespace: default
+  labels:
+    app: api-rest-service
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-rest-service
+  template:
+    metadata:
+      labels:
+        app: api-rest-service
+    spec:
+      containers:
+      - name: api-rest
+        image: api-rest-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+        env:
+        - name: DOWNSTREAM_URL
+          value: "http://mock-downstream-service:8080/api/v1/external-data"
+        - name: MAX_CONCURRENT_CONNECTIONS
+          value: "5"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-downstream-service
+  namespace: default
+  labels:
+    app: mock-downstream-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mock-downstream-service
+  template:
+    metadata:
+      labels:
+        app: mock-downstream-service
+    spec:
+      containers:
+      - name: mock-downstream
+        image: mock-downstream-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "250m"
+            memory: "128Mi"
+        env:
+        - name: DELAY_SECONDS
+          value: "8.0"

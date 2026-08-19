@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  policy-api:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: policy_api_p2
+    ports:
+      - "8001:8000"
+    environment:
+      - WORKER_URL=http://notification-worker:8090/process-event
+    depends_on:
+      - notification-worker
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+
+  notification-worker:
+    build:
+      context: ./workers
+      dockerfile: Dockerfile
+    container_name: notification_worker_p2
+    ports:
+      - "8090:8090"
+    environment:
+      - GATEWAY_URL=http://mock-gateways:8091
+    depends_on:
+      - mock-gateways
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+  mock-gateways:
+    build:
+      context: ./mock_services
+      dockerfile: Dockerfile
+    container_name: mock_gateways_p2
+    ports:
+      - "8091:8091"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+networks:
+  default:
+    name: net_pregunta_02

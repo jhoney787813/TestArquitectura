@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: policy-api-deployment
+  namespace: default
+  labels:
+    app: policy-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: policy-api
+  template:
+    metadata:
+      labels:
+        app: policy-api
+    spec:
+      containers:
+      - name: policy-api
+        image: policy-api:v2.0
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+        env:
+        - name: WORKER_URL
+          value: "http://notification-worker-service:8090/process-event"
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-worker-deployment
+  namespace: default
+  labels:
+    app: notification-worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notification-worker
+  template:
+    metadata:
+      labels:
+        app: notification-worker
+    spec:
+      containers:
+      - name: notification-worker
+        image: notification-worker:v2.0
+        ports:
+        - containerPort: 8090
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "250m"
+            memory: "256Mi"
+        env:
+        - name: GATEWAY_URL
+          value: "http://mock-gateways-service:8091"

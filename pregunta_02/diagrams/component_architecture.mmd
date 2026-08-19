@@ -1,0 +1,67 @@
+graph TB
+    subgraph ClientLayer ["1. CAPA DE CLIENTE"]
+        Client["Web / App Móvil<br>(Cliente Final)"]
+    end
+
+    subgraph BackendCore ["2. CORE BACKEND (Transactional Outbox)"]
+        API["Policy API Controller<br>(POST /api/v1/policies/emit)"]
+        Engine["Policy Domain Engine"]
+        OutboxWriter["Transactional Outbox Writer"]
+        
+        API --> Engine
+        Engine --> OutboxWriter
+    end
+
+    subgraph DatabaseLayer ["3. BASE DE DATOS LOCAL (Primary RDBMS)"]
+        TblPolicy[("Tabla policies<br>(SavePolicy)")]
+        TblAudit[("Tabla policy_audit_logs<br>(Auditoría Local ACID)")]
+        TblOutbox[("Tabla outbox_events<br>(Outbox Queue)")]
+        
+        ACID["⚡ TRANSACCIÓN LOCAL ACID<br>(BEGIN ... COMMIT)"]
+        
+        OutboxWriter --> ACID
+        ACID --> TblPolicy
+        ACID --> TblAudit
+        ACID --> TblOutbox
+    end
+
+    subgraph AsyncLayer ["4. CAPA ASÍNCRONA & WORKERS"]
+        Poller["Outbox Poller / CDC Worker"]
+        Worker["Notification & Event Worker Pool"]
+        Retry["Retry Handler<br>(Exponential Backoff)"]
+        CB["Circuit Breaker<br>(SMS Gateway)"]
+        DLQ[("Dead Letter Queue<br>(DLQ)")]
+        OpenSearch[("OpenSearch / ElasticSearch<br>(Auditoría Centralizada)")]
+
+        TblOutbox -.->|4. Polling Eventos| Poller
+        Poller --> Worker
+        Worker --> Retry
+        Worker --> CB
+        Retry -.->|Email Fallido| DLQ
+        Worker --> OpenSearch
+    end
+
+    subgraph ExternalGateways ["5. GATEWAYS EXTERNOS DE TERCEROS"]
+        EmailGW["Email Service (SMTP)<br>SendEmail"]
+        SMSGW["SMS Provider Gateway<br>SendSMS"]
+        PushFallback["Fallback Push Notification"]
+
+        Worker -->|5a. SendEmail| EmailGW
+        Worker -->|5b. SendSMS| SMSGW
+        CB -.->|Circuito Abierto| PushFallback
+    end
+
+    Client -->|1. Request Emit Policy| API
+    API -.->|3. Response HTTP 201 Created <50ms| Client
+
+    classDef clientStyle fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px;
+    classDef apiStyle fill:#d5e8d4,stroke:#82b366,stroke-width:2px;
+    classDef dbStyle fill:#e1d5e7,stroke:#9673a6,stroke-width:2px;
+    classDef asyncStyle fill:#ffe6cc,stroke:#d79b00,stroke-width:2px;
+    classDef alertStyle fill:#f8cecc,stroke:#b85450,stroke-width:2px;
+
+    class Client clientStyle;
+    class API,Worker apiStyle;
+    class TblPolicy,TblAudit,TblOutbox,OpenSearch dbStyle;
+    class Poller,Retry,CB asyncStyle;
+    class DLQ alertStyle;

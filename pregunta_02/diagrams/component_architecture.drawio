@@ -1,0 +1,164 @@
+<mxfile host="app.diagrams.net" modified="2026-08-19T13:00:00.000Z" agent="Antigravity Senior Architect" version="21.0.0" type="device">
+  <diagram id="component-arch-p2" name="Arquitectura de Componentes - Emisión de Pólizas (Ejercicio 2)">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- CONTENEDOR 1: CAPA DE CLIENTE -->
+        <mxCell id="c_client" value="CAPA DE CLIENTE (Presentation Layer)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=14;startSize=30;horizontal=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="240" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="comp_web" value="&lt;b&gt;Web / App Móvil&lt;/b&gt;&lt;br&gt;(Cliente Final)&lt;br&gt;&lt;i&gt;Solicita Emisión de Póliza&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="c_client">
+          <mxGeometry x="30" y="60" width="180" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- CONTENEDOR 2: API GATEWAY & CORE BACKEND -->
+        <mxCell id="c_backend" value="CORE BACKEND (Transactional Outbox Pattern)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=14;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="340" y="40" width="460" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="comp_api" value="&lt;b&gt;Policy API Controller&lt;/b&gt;&lt;br&gt;(FastAPI / .NET Core)&lt;br&gt;&lt;i&gt;POST /api/v1/policies/emit&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="c_backend">
+          <mxGeometry x="30" y="50" width="400" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="comp_domain" value="&lt;b&gt;Policy Domain Engine&lt;/b&gt;&lt;br&gt;Valida Reglas de Negocio &amp; Cobro" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="c_backend">
+          <mxGeometry x="30" y="160" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="comp_outbox_writer" value="&lt;b&gt;Transactional Outbox Writer&lt;/b&gt;&lt;br&gt;Ejecuta Transacción ACID Local" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="c_backend">
+          <mxGeometry x="250" y="160" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- CONTENEDOR 3: BASE DE DATOS PRINCIPAL -->
+        <mxCell id="c_db" value="BASE DE DATOS RELACIONAL (Primary RDBMS)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=14;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="340" y="500" width="460" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl_policies" value="&lt;b&gt;Tabla policies&lt;/b&gt;&lt;br&gt;[SavePolicy] Datos de Póliza" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="c_db">
+          <mxGeometry x="30" y="60" width="110" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl_local_audit" value="&lt;b&gt;Tabla policy_audit_logs&lt;/b&gt;&lt;br&gt;Auditoría Local (ACID)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="c_db">
+          <mxGeometry x="175" y="60" width="110" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl_outbox" value="&lt;b&gt;Tabla outbox_events&lt;/b&gt;&lt;br&gt;Eventos Pendientes" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontStyle=1;" vertex="1" parent="c_db">
+          <mxGeometry x="320" y="60" width="110" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl_acid_tx" value="⚡ MISMA TRANSACCIÓN LOCAL ACID (BEGIN ... COMMIT)" style="text;html=1;strokeColor=#b85450;fillColor=#f8cecc;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontStyle=1;fontSize=11;" vertex="1" parent="c_db">
+          <mxGeometry x="30" y="220" width="400" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- CONTENEDOR 4: CAPA DE PROCESAMIENTO ASÍNCRONO -->
+        <mxCell id="c_async" value="CAPA ASÍNCRONA &amp; WORKERS (Event-Driven Architecture)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=14;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="860" y="40" width="380" height="780" as="geometry" />
+        </mxCell>
+        <mxCell id="comp_cdc" value="&lt;b&gt;Outbox Poller / CDC Worker&lt;/b&gt;&lt;br&gt;Lee eventos de outbox_events" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="c_async">
+          <mxGeometry x="30" y="50" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="comp_worker" value="&lt;b&gt;Notification &amp; Event Worker Pool&lt;/b&gt;&lt;br&gt;Procesador de eventos en background" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;" vertex="1" parent="c_async">
+          <mxGeometry x="30" y="160" width="320" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- MECANISMOS DE RESILIENCIA EN WORKER -->
+        <mxCell id="comp_retry" value="&lt;b&gt;Retry Handler&lt;/b&gt;&lt;br&gt;Exponential Backoff" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="c_async">
+          <mxGeometry x="30" y="280" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="comp_cb" value="&lt;b&gt;Circuit Breaker&lt;/b&gt;&lt;br&gt;(Polly / Resilience4j)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="c_async">
+          <mxGeometry x="210" y="280" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="comp_dlq" value="&lt;b&gt;Dead Letter Queue (DLQ)&lt;/b&gt;&lt;br&gt;Cola de eventos fallidos retenidos" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=11;" vertex="1" parent="c_async">
+          <mxGeometry x="30" y="400" width="320" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="comp_opensearch" value="&lt;b&gt;ElasticSearch / OpenSearch Cluster&lt;/b&gt;&lt;br&gt;Auditoría Centralizada Append-Only" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=11;" vertex="1" parent="c_async">
+          <mxGeometry x="30" y="550" width="320" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- CONTENEDOR 5: GATEWAYS EXTERNOS -->
+        <mxCell id="c_external" value="GATEWAYS EXTERNOS DE TERCEROS" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=14;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="40" width="270" height="780" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_email" value="&lt;b&gt;Email Service (SMTP)&lt;/b&gt;&lt;br&gt;SendEmail" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="c_external">
+          <mxGeometry x="30" y="160" width="210" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_sms" value="&lt;b&gt;SMS Provider Gateway&lt;/b&gt;&lt;br&gt;SendSMS (Telefonía)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" vertex="1" parent="c_external">
+          <mxGeometry x="30" y="280" width="210" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_push" value="&lt;b&gt;Fallback Push / In-App&lt;/b&gt;&lt;br&gt;(Notificación Alternativa)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="c_external">
+          <mxGeometry x="30" y="380" width="210" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- CONEXIONES Y FLECHAS -->
+        <!-- Client -> API -->
+        <mxCell id="edge1" value="1. POST /policies/emit" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#0066CC;" edge="1" parent="1" source="comp_web" target="comp_api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- API -> Domain -> Outbox Writer -->
+        <mxCell id="edge2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="1" source="comp_api" target="comp_domain">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="1" source="comp_domain" target="comp_outbox_writer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Outbox Writer -> DB Tables -->
+        <mxCell id="edge4" value="2. ACID Commit" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#00994C;" edge="1" parent="1" source="comp_outbox_writer" target="lbl_acid_tx">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- API -> Client Response -->
+        <mxCell id="edge5" value="3. HTTP 201 Created (&lt;50ms)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;dashed=1;strokeColor=#00994C;" edge="1" parent="1" source="comp_api" target="comp_web">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="340" y="100" />
+              <mxPoint x="340" y="100" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Outbox Table -> Outbox Poller -->
+        <mxCell id="edge6" value="4. Polling Outbox Events" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#FF8000;" edge="1" parent="1" source="tbl_outbox" target="comp_cdc">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="830" y="590" />
+              <mxPoint x="830" y="110" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Poller -> Worker -->
+        <mxCell id="edge7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="1" source="comp_cdc" target="comp_worker">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Worker -> Email -->
+        <mxCell id="edge8" value="5a. Send Email" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="1" source="comp_worker" target="gw_email">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Worker -> Retry -> DLQ -->
+        <mxCell id="edge9" value="Falla Email" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;dashed=1;strokeColor=#CC0000;" edge="1" parent="1" source="comp_retry" target="comp_dlq">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Worker -> SMS -->
+        <mxCell id="edge10" value="5b. Send SMS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;" edge="1" parent="1" source="comp_worker" target="gw_sms">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1050" y="315" />
+              <mxPoint x="1050" y="315" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Circuit Breaker -> Fallback Push -->
+        <mxCell id="edge11" value="Circuito Abierto" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#CC0000;dashed=1;" edge="1" parent="1" source="comp_cb" target="gw_push">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Worker -> OpenSearch Audit -->
+        <mxCell id="edge12" value="5c. Ingest Central Audit" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#990099;" edge="1" parent="1" source="comp_worker" target="comp_opensearch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

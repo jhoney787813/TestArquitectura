@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  api-service:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: api_service_p1
+    ports:
+      - "8000:8000"
+    environment:
+      - DOWNSTREAM_URL=http://mock-downstream:8080/api/v1/external-data
+      - MAX_CONCURRENT_CONNECTIONS=5
+    depends_on:
+      - mock-downstream
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+
+  mock-downstream:
+    build:
+      context: ./mock_downstream
+      dockerfile: Dockerfile
+    container_name: mock_downstream_p1
+    ports:
+      - "8080:8080"
+    environment:
+      - DELAY_SECONDS=8.0
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+networks:
+  default:
+    name: net_pregunta_01
