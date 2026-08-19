@@ -29,20 +29,20 @@ if opt == "1":
     
     print("\n1. Probando Command con Payload Inválido (Monto = 0):")
     cmd_invalid = {
-        "policy_type": "VIDA",
-        "insured_name": "Jhon (Arquitecto)",
-        "insured_email": "jhoney7878@gmail.com",
+        "policyType": "VIDA",
+        "insuredName": "Jhon (Arquitecto)",
+        "insuredEmail": "jhoney7878@gmail.com",
         "amount": 0
     }
     r1 = requests.post(f"{BASE_URL}/api/v1/policies/commands/create", json=cmd_invalid)
     print(f"   Status HTTP: {r1.status_code} (ValidationBehavior -> 422 Unprocessable Entity)")
     print(f"   Body: {r1.text}")
 
-    print("\n2. Probando Command Válido ('CreatePolicyCommand'):")
+    print("\n2. Probando Command Válido ('CreatePolicyCommand' en C# .NET 9):")
     cmd_valid = {
-        "policy_type": "AUTO",
-        "insured_name": "Jhon E. Arquitecto Senior",
-        "insured_email": "jhoney7878@gmail.com",
+        "policyType": "AUTO",
+        "insuredName": "Jhon E. Arquitecto Senior",
+        "insuredEmail": "jhoney7878@gmail.com",
         "amount": 4500.00
     }
     r2 = requests.post(f"{BASE_URL}/api/v1/policies/commands/create", json=cmd_valid)
@@ -51,17 +51,17 @@ if opt == "1":
 
 elif opt == "2":
     print("\n" + "="*75)
-    print(" 📖 DEMO 2: EJECUCIÓN DE QUERIES (PILA DE LECTURA READ MODEL)")
+    print(" 📖 DEMO 2: EJECUCIÓN DE QUERIES (PILA DE LECTURA READ MODEL .NET 9)")
     print("="*75)
     
     # Primero crear una póliza
     r_create = requests.post(f"{BASE_URL}/api/v1/policies/commands/create", json={
-        "policy_type": "HOGAR",
-        "insured_name": "Cliente Ejemplo",
-        "insured_email": "cliente@seguros.com",
+        "policyType": "HOGAR",
+        "insuredName": "Cliente Ejemplo",
+        "insuredEmail": "cliente@seguros.com",
         "amount": 1200.00
     }).json()
-    policy_id = r_create["policy_id"]
+    policy_id = r_create.get("policyId") or r_create.get("policy_id")
     
     print(f"\nConsultando Query 'GetPolicyByIdQuery' para ID '{policy_id}':")
     r_query = requests.get(f"{BASE_URL}/api/v1/policies/queries/{policy_id}")
@@ -74,29 +74,32 @@ elif opt == "3":
     print(" 🔄 DEMO 3: FLUJO COMPLETO CQRS (.NET 9 MEDIATR CLEAN ARCHITECTURE)")
     print("="*75)
     
-    print("\n[PASO 1] Ejecutando 'CreatePolicyCommand':")
+    print("\n[PASO 1] Ejecutando 'CreatePolicyCommand' en C# .NET 9:")
     r1 = requests.post(f"{BASE_URL}/api/v1/policies/commands/create", json={
-        "policy_type": "SALUD",
-        "insured_name": "Jhon (Arquitecto de Software)",
-        "insured_email": "jhoney7878@gmail.com",
+        "policyType": "SALUD",
+        "insuredName": "Jhon (Arquitecto de Software)",
+        "insuredEmail": "jhoney7878@gmail.com",
         "amount": 8900.00
     }).json()
-    pid = r1["policy_id"]
-    print(f" Póliza creada con ID: {pid} (Estado inicial: DRAFT)")
+    pid = r1.get("policyId") or r1.get("policy_id")
+    print(f" Póliza creada en .NET 9 con ID: {pid}")
 
     print(f"\n[PASO 2] Consultando estado previo en el Read Model ('GetPolicyByIdQuery'):")
     r2 = requests.get(f"{BASE_URL}/api/v1/policies/queries/{pid}").json()
-    print(f" Estado en Read Model: {r2['data']['status']}")
+    status_val = r2['data']['status'] if 'data' in r2 else r2.get('status')
+    print(f" Estado en Read Model: {status_val}")
 
-    print(f"\n[PASO 3] Ejecutando comando de emisión 'EmitPolicyCommand':")
+    print(f"\n[PASO 3] Ejecutando comando de emisión 'EmitPolicyCommand' en C# .NET 9:")
     r3 = requests.post(f"{BASE_URL}/api/v1/policies/commands/emit", json={
-        "policy_id": pid,
-        "payment_reference": "PAY-REF-998811"
+        "policyId": pid,
+        "paymentReference": "PAY-REF-998811"
     }).json()
-    print(f" Resultado Emisión: {r3['status']} -> Póliza {pid} ahora en ACTIVE")
+    status_emit = r3.get("status") or r3.get("currentStatus")
+    print(f" Resultado Emisión: {status_emit} -> Póliza {pid} ahora en ACTIVE")
 
     print(f"\n[PASO 4] Consultando estado final actualizado en Read Model:")
     r4 = requests.get(f"{BASE_URL}/api/v1/policies/queries/{pid}").json()
-    print(f" Estado Final en Read Model: {r4['data']['status']} | Referencia Pago: {r4['data']['payment_ref']}")
+    data_res = r4.get("data", r4)
+    print(f" Estado Final en Read Model: {data_res.get('status')} | Referencia Pago: {data_res.get('paymentRef') or data_res.get('payment_ref')}")
 
 EOF
