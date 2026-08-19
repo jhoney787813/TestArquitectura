@@ -1,0 +1,40 @@
+graph TB
+    subgraph Users ["1. ACTORES Y PERSONAS"]
+        SRE["Persona: SRE / DevOps / Arquitecto<br>Monitorea métricas RED/USE, trazas distribuidas y logs estructurados"]
+    end
+
+    subgraph SystemBoundary ["2. C4 SYSTEM BOUNDARY: ARQUITECTURA DE OBSERVABILIDAD"]
+        Grafana["Container: Grafana Centralized Dashboards<br>(Visualización y Alertas unificadas)"]
+        OTelCollector["Container: OpenTelemetry Collector<br>(OTLP Agent para Tracing y Métricas)"]
+        
+        subgraph Stack ["3. PILA DE ALMACENAMIENTO DE TELEMETRÍA"]
+            Prometheus[("Container: Prometheus Server<br>(Métricas en /metrics: Latencia, Requests, Error Rate)")]
+            Jaeger[("Container: Jaeger / Zipkin Backend<br>(Almacena Spans y W3C traceparent context)")]
+            Loki[("Container: Grafana Loki / Serilog Sink<br>(Logs JSON estructurados con RFC 7807)")]
+        end
+
+        subgraph CoreApp ["4. CAPA DE APLICACIÓN Y MIDDLEWARE"]
+            CoreAPI["Container: Microservice Core API<br>(.NET 9 / FastAPI Solution con OpenTelemetry SDK)"]
+            Middleware["Component: Global Exception Middleware<br>(Mapea excepciones a RFC 7807 ProblemDetails & Modelo Richardson)"]
+        end
+    end
+
+    SRE -->|Visualiza Dashboards| Grafana
+    Grafana -->|Consulta Métricas| Prometheus
+    Grafana -->|Consulta Trazas| Jaeger
+    Grafana -->|Consulta Logs| Loki
+
+    CoreAPI -->|Envia Spans OTLP| OTelCollector
+    OTelCollector -->|Exporta Trazas| Jaeger
+    OTelCollector -->|Scrape /metrics| Prometheus
+    CoreAPI -->|Logs JSON Estructurados| Loki
+    CoreAPI -->|Intercepta Excepciones| Middleware
+
+    classDef c4User fill:#08427b,stroke:#073866,fontColor:#ffffff;
+    classDef c4Container fill:#1168bd,stroke:#0e5296,fontColor:#ffffff;
+    classDef c4Db fill:#85bbf0,stroke:#0e5296,fontColor:#000000;
+    classDef c4Producer fill:#2b7bba,stroke:#0e5296,fontColor:#ffffff;
+
+    class SRE c4User;
+    class Grafana,OTelCollector,CoreAPI,Middleware c4Container;
+    class Prometheus,Jaeger,Loki c4Db;

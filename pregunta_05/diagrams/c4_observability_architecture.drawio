@@ -1,0 +1,90 @@
+<mxfile host="app.diagrams.net" modified="2026-08-19T17:55:00.000Z" agent="Antigravity Senior Architect" version="21.0.0" type="device">
+  <diagram id="c4-observability-arch" name="C4 Model Level 2 - Container Diagram Observability Architecture">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1100" math="0" shadow="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- C4 BOUNDARY -->
+        <mxCell id="c4_boundary" value="Sistema de Observabilidad &amp; Gestión de Excepciones (Observability Boundary)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#000000;fontStyle=1;fontSize=16;startSize=40;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1720" height="980" as="geometry" />
+        </mxCell>
+
+        <!-- PERSONS / ACTORS -->
+        <mxCell id="actor_sre" value="&lt;b&gt;[Person]&lt;/b&gt;&lt;br&gt;&lt;b&gt;SRE / DevOps / Arquitecto&lt;/b&gt;&lt;br&gt;&lt;i&gt;Inspecciona salud del sistema, trazas y métricas en tiempo real&lt;/i&gt;" style="html=1;whiteSpace=wrap;fillColor=#08427b;strokeColor=#073866;fontColor=#ffffff;shape=mxgraph.c4.person;align=center;fontSize=12;" vertex="1" parent="c4_boundary">
+          <mxGeometry x="40" y="90" width="220" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- GRAFANA DASHBOARDS CONTAINER -->
+        <mxCell id="c4_grafana" value="&lt;b&gt;[Container: Visualization &amp; Alerting]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Grafana Centralized Dashboards&lt;/b&gt;&lt;br&gt;&lt;i&gt;Grafana v10.0&lt;/i&gt;&lt;br&gt;Correlaciona Métricas RED/USE, Trazas de Jaeger y Logs de Loki" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="c4_boundary">
+          <mxGeometry x="320" y="100" width="340" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- OPENTELEMETRY COLLECTOR CONTAINER -->
+        <mxCell id="c4_otel" value="&lt;b&gt;[Container: Telemetry Pipeline]&lt;/b&gt;&lt;br&gt;&lt;b&gt;OpenTelemetry Collector / Agent&lt;/b&gt;&lt;br&gt;&lt;i&gt;OTLP Protocol Receiver &amp; Exporter&lt;/i&gt;&lt;br&gt;Recibe spans, contexto W3C traceparent y métricas unificadas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="c4_boundary">
+          <mxGeometry x="720" y="100" width="360" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- TELEMETRY STACK CONTAINERS (PROMETHEUS, JAEGER, LOKI) -->
+        <mxCell id="c4_telemetry_stack" value="PILA DE ALMACENAMIENTO DE TELEMETRÍA (3 PILARES DE OBSERVABILIDAD)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=#495057;fontStyle=1;fontSize=13;startSize=30;" vertex="1" parent="c4_boundary">
+          <mxGeometry x="1140" y="80" width="540" height="820" as="geometry" />
+        </mxCell>
+
+        <mxCell id="c4_prometheus" value="&lt;b&gt;[Container: Metrics Datastore]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Prometheus Server (/metrics)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Prometheus v2.45&lt;/i&gt;&lt;br&gt;Almacena métricas de latencia, peticiones HTTP y contador de errores" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#85bbf0;strokeColor=#0e5296;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="c4_telemetry_stack">
+          <mxGeometry x="60" y="70" width="420" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="c4_jaeger" value="&lt;b&gt;[Container: Distributed Tracing Engine]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Jaeger / Zipkin Tracing Backend&lt;/b&gt;&lt;br&gt;&lt;i&gt;Jaeger v1.47&lt;/i&gt;&lt;br&gt;Almacena grafos de llamadas distribuidas con TraceId y SpanId" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#85bbf0;strokeColor=#0e5296;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="c4_telemetry_stack">
+          <mxGeometry x="60" y="280" width="420" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="c4_loki" value="&lt;b&gt;[Container: Structured Log Storage]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Grafana Loki / Serilog Sink&lt;/b&gt;&lt;br&gt;&lt;i&gt;Loki v2.8&lt;/i&gt;&lt;br&gt;Ingesta de logs JSON estructurados con RFC 7807 ProblemDetails" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#85bbf0;strokeColor=#0e5296;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="c4_telemetry_stack">
+          <mxGeometry x="60" y="490" width="420" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- MICROSERVICIO APLICATIVO CON MIDDLEWARE RFC 7807 -->
+        <mxCell id="c4_app_service" value="CAPA DE APLICACIÓN Y MIDDLEWARE GLOBAL DE OBSERVABILIDAD" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=#495057;fontStyle=1;fontSize=14;startSize=35;" vertex="1" parent="c4_boundary">
+          <mxGeometry x="40" y="320" width="1040" height="580" as="geometry" />
+        </mxCell>
+
+        <mxCell id="svc_core_api" value="&lt;b&gt;[Container: Microservice Core API]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Insurance Core &amp; Exception Pipeline&lt;/b&gt;&lt;br&gt;&lt;i&gt;.NET 9 / FastAPI Solution&lt;/i&gt;&lt;br&gt;OpenTelemetry SDK Instrumentation &amp; Serilog JSON Logger" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b7bba;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;" vertex="1" parent="c4_app_service">
+          <mxGeometry x="60" y="70" width="420" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mw_rfc7807" value="&lt;b&gt;[Component: Global Exception Middleware]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Richardson Model Mapper &amp; RFC 7807 Handler&lt;/b&gt;&lt;br&gt;&lt;i&gt;Intercepta excepciones y asigna HTTP 404, 409, 422, 503&lt;/i&gt;&lt;br&gt;Reemplaza el anti-patrón catch(Exception ex) { return BadRequest(); }" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6c757d;strokeColor=#343a40;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="c4_app_service">
+          <mxGeometry x="540" y="70" width="440" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="domain_layer" value="&lt;b&gt;[Component: Clean Architecture Domain &amp; Rules]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Domain Exceptions &amp; Infrastructure Services&lt;/b&gt;&lt;br&gt;&lt;i&gt;DomainException, ResourceNotFoundException, DownstreamDependencyException&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6c757d;strokeColor=#343a40;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="c4_app_service">
+          <mxGeometry x="60" y="300" width="920" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- FLECHAS DE CONEXIÓN Y PROTOCOLOS -->
+        <mxCell id="f1" value="Visualiza Dashboards" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#08427b;" edge="1" parent="c4_boundary" source="actor_sre" target="c4_grafana">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f2" value="Consulta Métricas" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1168bd;" edge="1" parent="c4_boundary" source="c4_grafana" target="c4_prometheus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f3" value="Consulta Trazas" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1168bd;" edge="1" parent="c4_boundary" source="c4_grafana" target="c4_jaeger">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f4" value="Consulta Logs JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1168bd;" edge="1" parent="c4_boundary" source="c4_grafana" target="c4_loki">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f5" value="Envia Spans &amp; TraceContext" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2b7bba;" edge="1" parent="c4_boundary" source="svc_core_api" target="c4_otel">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="f6" value="Mapea Excepciones a RFC 7807" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6c757d;" edge="1" parent="c4_boundary" source="svc_core_api" target="mw_rfc7807">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
