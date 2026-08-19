@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Multi-Protocolo (REST, SOAP & WebSockets) - Ejercicio 4</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h1 { color: #38bdf8; font-size: 24px; border-bottom: 2px solid #334155; padding-bottom: 10px; margin-top: 0; }
+        
+        /* PESTAÑAS (TABS) */
+        .tabs { display: flex; gap: 5px; border-bottom: 2px solid #334155; margin-bottom: 20px; }
+        .tab-btn { padding: 12px 20px; background: #0f172a; color: #94a3b8; border: none; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; }
+        .tab-btn:hover { background: #334155; color: #fff; }
+        .tab-btn.active { background: #0284c7; color: #fff; border-bottom: 3px solid #38bdf8; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card { background: #0f172a; padding: 20px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 20px; }
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 12px; color: #94a3b8; }
+        input, select, textarea, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #475569; background: #1e293b; color: #fff; box-sizing: border-box; font-family: inherit; }
+        textarea { height: 100px; font-family: 'Courier New', Courier, monospace; font-size: 12px; }
+        button { font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 15px; }
+        
+        .btn-login { background: #0284c7; } .btn-login:hover { background: #0369a1; }
+        .btn-rest { background: #059669; } .btn-rest:hover { background: #047857; }
+        .btn-soap { background: #d97706; } .btn-soap:hover { background: #b45309; }
+        .btn-ws { background: #16a34a; } .btn-ws:hover { background: #15803d; }
+        .btn-revoke { background: #dc2626; } .btn-revoke:hover { background: #b91c1c; }
+        .btn-send { background: #9333ea; } .btn-send:hover { background: #7e22ce; }
+        
+        #log { background: #000; font-family: 'Courier New', Courier, monospace; height: 260px; overflow-y: auto; padding: 12px; border-radius: 6px; border: 1px solid #334155; font-size: 13px; margin-top: 10px; }
+        .log-info { color: #38bdf8; } .log-success { color: #4ade80; } .log-danger { color: #f87171; } .log-warn { color: #facc15; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+        .badge-disconnected { background: #991b1b; color: #fecaca; }
+        .badge-connected { background: #166534; color: #bbf7d0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Dashboard Multi-Protocolo & Seguridad (REST, SOAP y WebSockets)</h1>
+        <p style="font-size: 13px; color: #94a3b8;">Ejercicio 4: Demostración unificada de OAuth 2.0 / JWT RS256 con revocación inmediata en Redis Blacklist para REST, SOAP y WebSockets.</p>
+
+        <!-- NAVEGACIÓN POR PESTAÑAS -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('tab-auth')">🔑 1. AUTH & REDIS REVOCACIÓN</button>
+            <button class="tab-btn" onclick="switchTab('tab-rest')">🌐 2. REST API</button>
+            <button class="tab-btn" onclick="switchTab('tab-soap')">🧼 3. SOAP WSDL API</button>
+            <button class="tab-btn" onclick="switchTab('tab-ws')">⚡ 4. WEBSOCKETS STREAM</button>
+        </div>
+
+        <!-- PESTAÑA 1: AUTENTICACIÓN Y REVOCACIÓN EN REDIS -->
+        <div id="tab-auth" class="tab-content active">
+            <div class="card">
+                <h3 style="color: #38bdf8; margin-top:0;">Autenticación OAuth 2.0 / JWT & Control de Revocación</h3>
+                <label>API Host Target</label>
+                <input type="text" id="apiHost" value="http://localhost:8003">
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label>Usuario</label>
+                        <input type="text" id="username" value="admin@seguros.com">
+                    </div>
+                    <div>
+                        <label>Contraseña</label>
+                        <input type="password" id="password" value="Password123!">
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                    <button class="btn-login" onclick="doLogin()">🔑 1. Iniciar Sesión (POST /api/v1/auth/login)</button>
+                    <button class="btn-revoke" onclick="revokeToken()">🛑 2. Revocar Token en Redis (POST /api/v1/auth/revoke)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 2: REST API PROTEGIDA -->
+        <div id="tab-rest" class="tab-content">
+            <div class="card">
+                <h3 style="color: #4ade80; margin-top:0;">🌐 Recurso Protegido REST API (JSON over HTTP)</h3>
+                <p style="font-size: 12px; color: #94a3b8;">Envía el token JWT recibido en el Header <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+                <button class="btn-rest" onclick="testRestApi()">🚀 Probar GET /api/v1/policies</button>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 3: SOAP API WSDL -->
+        <div id="tab-soap" class="tab-content">
+            <div class="card">
+                <h3 style="color: #facc15; margin-top:0;">🧼 Servicio SOAP WSDL & WS-Security Envelope</h3>
+                <p style="font-size: 12px; color: #94a3b8;">Envía la solicitud SOAP estructurada en XML con el token en la cabecera <code>WS-Security</code>.</p>
+                
+                <label>SOAP Envelope Request XML:</label>
+                <textarea id="soapXmlRequest"><s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+  <s:Header>
+    <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+      <wsse:BinarySecurityToken>INSERT_JWT_TOKEN_HERE</wsse:BinarySecurityToken>
+    </wsse:Security>
+  </s:Header>
+  <s:Body>
+    <GetPolicyRequest xmlns="http://seguros.com/soap">
+      <PolicyId>POL-SOAP-9901</PolicyId>
+    </GetPolicyRequest>
+  </s:Body>
+</s:Envelope></textarea>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <button class="btn-soap" onclick="testSoapApi()">🧼 Invocar Servicio SOAP (POST /PolicySoapService.svc)</button>
+                    <button class="btn-login" onclick="getSoapWsdl()">📄 Ver WSDL XML (GET /PolicySoapService.svc?wsdl)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 4: WEBSOCKETS EN TIEMPO REAL -->
+        <div id="tab-ws" class="tab-content">
+            <div class="card">
+                <h3 style="color: #a855f7; margin-top:0;">⚡ Stream Bi-Direccional WebSockets (Full-Duplex TCP)</h3>
+                <div>Estado de Conexión: <span id="statusBadge" class="badge badge-disconnected">DESCONECTADO</span></div>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                    <button class="btn-ws" onclick="connectWS()">🔌 Conectar WebSocket (WS /ws/secure-stream)</button>
+                    <button class="btn-revoke" onclick="revokeToken()">🛑 Revocar Token y Expulsar WebSocket</button>
+                </div>
+
+                <label style="margin-top:15px;">Enviar Marco de Datos WebSocket:</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="wsMsg" value="Consulta estado de póliza POL-9901 en vivo" style="margin-top:0;">
+                    <button class="btn-send" onclick="sendWSMsg()" style="margin-top:0; width:160px;">Enviar Marco</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONSOLA DE LOGS COMPARTIDA -->
+        <div class="card">
+            <h3 style="color: #38bdf8; margin-top:0; font-size:16px;">🖥️ Consola de Salida y Logs en Tiempo Real</h3>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = null;
+        let ws = null;
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.currentTarget.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function getApiHost() {
+            return document.getElementById('apiHost').value || 'http://localhost:8003';
+        }
+
+        function log(msg, type = 'info') {
+            const l = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            l.innerHTML += `<div class="log-${type}">[${time}] ${msg}</div>`;
+            l.scrollTop = l.scrollHeight;
+        }
+
+        async function doLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            const apiHost = getApiHost();
+            log(`Iniciando sesión REST en ${apiHost} para: ${u}...`, 'info');
+
+            try {
+                const res = await fetch(`${apiHost}/api/v1/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    currentToken = data.access_token;
+                    log(`✅ Login exitoso! Token JWT RS256 recibido (Validez: ${data.expires_in_minutes}m)`, 'success');
+                    // Actualizar token en textarea SOAP
+                    const soapTa = document.getElementById('soapXmlRequest');
+                    soapTa.value = soapTa.value.replace(/<wsse:BinarySecurityToken>.*?<\/wsse:BinarySecurityToken>/, `<wsse:BinarySecurityToken>${currentToken}</wsse:BinarySecurityToken>`);
+                } else {
+                    log(`❌ Error de Login: ${data.detail}`, 'danger');
+                }
+            } catch (err) {
+                log(`❌ Error de conexión: ${err}`, 'danger');
+            }
+        }
+
+        async function testRestApi() {
+            if (!currentToken) { alert("Por favor inicia sesión primero."); return; }
+            const apiHost = getApiHost();
+            log(`🌐 Probando GET ${apiHost}/api/v1/policies con Bearer JWT...`, 'info');
+
+            try {
+                const res = await fetch(`${apiHost}/api/v1/policies`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    log(`✅ REST AUTORIZADO (HTTP 200): ${JSON.stringify(data)}`, 'success');
+                } else {
+                    log(`🛑 REST RECHAZADO (HTTP ${res.status}): ${JSON.stringify(data)}`, 'danger');
+                }
+            } catch (err) {
+                log(`❌ Error REST: ${err}`, 'danger');
+            }
+        }
+
+        async function testSoapApi() {
+            if (!currentToken) { alert("Por favor inicia sesión primero."); return; }
+            const apiHost = getApiHost();
+            log(`🧼 Invocando servicio SOAP POST ${apiHost}/soap/PolicySoapService.svc...`, 'info');
+
+            let xmlReq = document.getElementById('soapXmlRequest').value;
+            xmlReq = xmlReq.replace(/<wsse:BinarySecurityToken>.*?<\/wsse:BinarySecurityToken>/, `<wsse:BinarySecurityToken>${currentToken}</wsse:BinarySecurityToken>`);
+
+            try {
+                const res = await fetch(`${apiHost}/soap/PolicySoapService.svc`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/xml',
+                        'Authorization': `Bearer ${currentToken}` 
+                    },
+                    body: xmlReq
+                });
+                const text = await res.text();
+                if (res.ok) {
+                    log(`✅ SOAP RESPUESTA EXITOSA (HTTP 200 XML):\n${text}`, 'success');
+                } else {
+                    log(`🛑 SOAP RECHAZADO / FAULT (HTTP ${res.status} XML):\n${text}`, 'danger');
+                }
+            } catch (err) {
+                log(`❌ Error SOAP: ${err}`, 'danger');
+            }
+        }
+
+        async function getSoapWsdl() {
+            const apiHost = getApiHost();
+            log(`📄 Solicitando WSDL SOAP GET ${apiHost}/soap/PolicySoapService.svc?wsdl...`, 'info');
+            try {
+                const res = await fetch(`${apiHost}/soap/PolicySoapService.svc?wsdl`);
+                const text = await res.text();
+                log(`📄 WSDL XML Recibido:\n${text}`, 'warn');
+            } catch (err) {
+                log(`❌ Error obteniendo WSDL: ${err}`, 'danger');
+            }
+        }
+
+        function connectWS() {
+            if (!currentToken) { alert("Por favor inicia sesión primero."); return; }
+
+            const apiHost = getApiHost();
+            const wsBase = apiHost.replace('http:', 'ws:').replace('https:', 'wss:');
+            const wsUrl = `${wsBase}/ws/secure-stream?token=${currentToken}`;
+            log(`⚡ Conectando a WebSocket: ${wsUrl}...`, 'warn');
+
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                document.getElementById('statusBadge').className = 'badge badge-connected';
+                document.getElementById('statusBadge').innerText = 'CONECTADO';
+                log('🔌 WebSocket Conectado & Handshake JWT Validado!', 'success');
+            };
+
+            ws.onmessage = (evt) => {
+                log(`📩 Recibido de WebSocket: ${evt.data}`, 'info');
+            };
+
+            ws.onclose = (evt) => {
+                document.getElementById('statusBadge').className = 'badge badge-disconnected';
+                document.getElementById('statusBadge').innerText = 'DESCONECTADO';
+                log(`🛑 WebSocket Desconectado (Código: ${evt.code}, Razón: ${evt.reason || 'Token Revocado en Redis'})`, 'danger');
+            };
+
+            ws.onerror = (err) => {
+                log(`❌ Error en WebSocket`, 'danger');
+            };
+        }
+
+        function sendWSMsg() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) { alert("El WebSocket no está conectado."); return; }
+            const msg = document.getElementById('wsMsg').value;
+            ws.send(msg);
+            log(`📤 Enviado por WebSocket: ${msg}`, 'warn');
+        }
+
+        async function revokeToken() {
+            if (!currentToken) { alert("No hay un token activo para revocar."); return; }
+
+            const apiHost = getApiHost();
+            log(`🛑 Solicitando Revocación de Token en Redis Blacklist...`, 'danger');
+
+            try {
+                const res = await fetch(`${apiHost}/api/v1/auth/revoke`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: currentToken, reason: "DEMO_REVOCATION" })
+                });
+                const data = await res.json();
+                log(`🛑 Respuesta de Revocación: ${JSON.stringify(data)}`, 'warn');
+                log(`💡 Ahora prueba hacer GET en REST o invocar SOAP para presenciar el rechazo HTTP 401 inmediatarente!`, 'warn');
+            } catch (err) {
+                log(`❌ Error revocando token: ${err}`, 'danger');
+            }
+        }
+    </script>
+</body>
+</html>

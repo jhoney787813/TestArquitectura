@@ -1,0 +1,39 @@
+graph TB
+    subgraph Users ["1. ACTORES Y CLIENTES"]
+        User["Persona: Cliente / Usuario / Aplicación<br>Autentica vía OAuth 2.0 / JWT RS256"]
+        ClientApp["Container: Web Application UI<br>(http://localhost:8084)<br>Cliente Multi-Protocolo por Pestañas"]
+    end
+
+    subgraph SystemBoundary ["2. C4 SYSTEM BOUNDARY: ESQUEMA DE SEGURIDAD MULTI-PROTOCOLO"]
+        IdP["Container: Identity Provider & Auth Server<br>(.NET 9 Clean Architecture)<br>Emisión de Access Tokens JWT RS256"]
+        
+        RedisBlacklist[("Container: Redis Token Blacklist<br>(Redis Cluster TTL = Token Expiry)<br>Almacena JTIs revocados para validación instantánea en < 1ms")]
+        
+        REST["Container: REST API Gateway<br>(Endpoints /api/v1/policies)<br>Valida Header Bearer JWT & Redis Blacklist"]
+        
+        SOAP["Container: SOAP WSDL Service<br>(Endpoint /soap/PolicySoapService.svc)<br>Valida WS-Security XML Header & Redis Blacklist"]
+        
+        WS["Container: WebSockets Gateway<br>(Endpoint ws://localhost:8003/ws/secure-stream)<br>Handshake de seguridad & Cierre dinámico si token se revoca"]
+    end
+
+    User -->|1. Iniciar Sesión| ClientApp
+    ClientApp -->|2. POST /api/v1/auth/login| IdP
+    IdP -.->|3. Emit JWT RS256 (JTI)| ClientApp
+
+    ClientApp -->|4a. Consumo REST (Bearer)| REST
+    ClientApp -->|4b. Invoca SOAP (WS-Security XML)| SOAP
+    ClientApp -->|4c. Conecta WebSocket (Token)| WS
+
+    IdP -->|🛑 PREGUNTA B: Revoca Token (Guarda JTI)| RedisBlacklist
+    REST -.->|Check Blacklist < 1ms| RedisBlacklist
+    SOAP -.->|Check Blacklist < 1ms| RedisBlacklist
+    WS -.->|Expulsa Socket si Revocado| RedisBlacklist
+
+    classDef c4User fill:#08427b,stroke:#073866,fontColor:#ffffff;
+    classDef c4Container fill:#1168bd,stroke:#0e5296,fontColor:#ffffff;
+    classDef c4Db fill:#85bbf0,stroke:#0e5296,fontColor:#000000;
+    classDef c4Producer fill:#2b7bba,stroke:#0e5296,fontColor:#ffffff;
+
+    class User c4User;
+    class IdP,REST,SOAP,WS,ClientApp c4Container;
+    class RedisBlacklist c4Db;

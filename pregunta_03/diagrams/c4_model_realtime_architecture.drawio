@@ -1,90 +1,89 @@
-<mxfile host="app.diagrams.net" modified="2026-08-19T14:18:00.000Z" agent="Antigravity Senior Architect" version="21.0.0" type="device">
+<mxfile host="app.diagrams.net" agent="Antigravity Senior Architect">
   <diagram id="c4-realtime-arch" name="C4 Model Level 2 - Container Diagram Real-Time Architecture">
-    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="1">
+    <mxGraphModel dx="2041" dy="1064" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="1">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-
-        <!-- C4 BOUNDARY: REAL-TIME INSURANCE SYSTEM -->
-        <mxCell id="c4_boundary" value="Sistema de Rastreo en Tiempo Real (Real-Time Insurance System Boundary)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#000000;fontStyle=1;fontSize=16;startSize=40;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="40" width="1520" height="880" as="geometry" />
+        <mxCell id="c4_boundary" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#000000;fontStyle=1;fontSize=16;startSize=40;dashed=1;" value="Sistema de Rastreo en Tiempo Real (Real-Time Insurance System Boundary)" vertex="1">
+          <mxGeometry height="1070" width="1770" x="50" y="160" as="geometry" />
         </mxCell>
-
-        <!-- PERSON / ACTOR -->
-        <mxCell id="actor_user" value="&lt;b&gt;[Person]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Cliente / Perito / Asegurado&lt;/b&gt;&lt;br&gt;&lt;i&gt;Visualiza estados de Emisión, Inspección y Siniestros en vivo&lt;/i&gt;" style="html=1;whiteSpace=wrap;fillColor=#08427b;strokeColor=#073866;fontColor=#ffffff;shape=mxgraph.c4.person;align=center;fontSize=12;" vertex="1" parent="c4_boundary">
-          <mxGeometry x="40" y="80" width="200" height="140" as="geometry" />
+        <mxCell id="actor_user" parent="c4_boundary" style="html=1;whiteSpace=wrap;fillColor=#08427b;strokeColor=#073866;fontColor=#ffffff;shape=mxgraph.c4.person;align=center;fontSize=12;" value="&lt;b&gt;[Person]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Cliente / Perito / Asegurado&lt;/b&gt;&lt;br&gt;&lt;i&gt;Visualiza estados de Emisión, Inspección y Siniestros en vivo&lt;/i&gt;" vertex="1">
+          <mxGeometry height="140" width="200" x="40" y="80" as="geometry" />
         </mxCell>
-
-        <!-- CONTAINER 1: CLIENT FRONTEND -->
-        <mxCell id="c4_client" value="&lt;b&gt;[Container: Single Page Application / Mobile App]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Live Status Dashboard UI&lt;/b&gt;&lt;br&gt;&lt;i&gt;React / Angular / Flutter&lt;/i&gt;&lt;br&gt;Suscrito a eventos mediante SSE y SignalR WebSockets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="c4_boundary">
-          <mxGeometry x="320" y="90" width="300" height="120" as="geometry" />
+        <mxCell id="c4_client" parent="c4_boundary" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;fontStyle=1;" value="&lt;b&gt;[Container: Single Page Application / Mobile App]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Live Status Dashboard UI&lt;/b&gt;&lt;br&gt;&lt;i&gt;React / Angular / Flutter&lt;/i&gt;&lt;br&gt;Suscrito a eventos mediante SSE y SignalR WebSockets" vertex="1">
+          <mxGeometry height="120" width="300" x="270" y="250" as="geometry" />
         </mxCell>
-
-        <!-- CONTAINER 2: REAL-TIME SIGNALR / SSE GATEWAY -->
-        <mxCell id="c4_gateway" value="&lt;b&gt;[Container: Microservice API]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Real-Time SignalR &amp; SSE Gateway&lt;/b&gt;&lt;br&gt;&lt;i&gt;.NET Core SignalR / FastAPI Hub&lt;/i&gt;&lt;br&gt;Mantiene conexiones persistentes HTTP/2 SSE y WebSockets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="c4_boundary">
-          <mxGeometry x="720" y="90" width="340" height="120" as="geometry" />
+        <mxCell id="eyLJPpWVLhbL38D3-m8F-4" edge="1" parent="c4_boundary" source="c4_gateway" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="svc_emision">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="770.07" y="200" />
+              <mxPoint x="770.07" y="490" />
+              <mxPoint x="370.07" y="490" />
+              <mxPoint x="370.07" y="770" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-
-        <!-- CONTAINER 3: REDIS PUB/SUB BACKPLANE -->
-        <mxCell id="c4_redis" value="&lt;b&gt;[Container: In-Memory Datastore]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Redis Pub/Sub Backplane&lt;/b&gt;&lt;br&gt;&lt;i&gt;Redis Cluster v7.0&lt;/i&gt;&lt;br&gt;Sincroniza mensajes del Hub entre múltiples nodos del Gateway" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#85bbf0;strokeColor=#0e5296;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="c4_boundary">
-          <mxGeometry x="1160" y="80" width="300" height="140" as="geometry" />
+        <mxCell id="c4_gateway" parent="c4_boundary" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;fontStyle=1;" value="&lt;b&gt;[Container: Microservice API]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Real-Time SignalR &amp; SSE Gateway&lt;/b&gt;&lt;br&gt;&lt;i&gt;.NET Core SignalR / FastAPI Hub&lt;/i&gt;&lt;br&gt;Mantiene conexiones persistentes HTTP/2 SSE y WebSockets" vertex="1">
+          <mxGeometry height="120" width="340" x="870" y="80" as="geometry" />
         </mxCell>
-
-        <!-- CONTAINER 4: KAFKA CLUSTER (EVENT BACKBONE) -->
-        <mxCell id="c4_kafka" value="&lt;b&gt;[Container: Event Streaming Platform]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Apache Kafka Event Backbone&lt;/b&gt;&lt;br&gt;&lt;i&gt;Topics: policy-events, inspection-events, claims-events&lt;/i&gt;&lt;br&gt;Almacena streams ordenados de eventos de dominio con alta concurrencia" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#1168bd;strokeColor=#0e5296;fontColor=#ffffff;fontSize=13;fontStyle=1;" vertex="1" parent="c4_boundary">
-          <mxGeometry x="720" y="340" width="340" height="160" as="geometry" />
+        <mxCell id="c4_redis" parent="c4_boundary" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#85bbf0;strokeColor=#0e5296;fontColor=#000000;fontSize=12;fontStyle=1;" value="&lt;b&gt;[Container: In-Memory Datastore]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Redis Pub/Sub Backplane&lt;/b&gt;&lt;br&gt;&lt;i&gt;Redis Cluster v7.0&lt;/i&gt;&lt;br&gt;Sincroniza mensajes del Hub entre múltiples nodos del Gateway" vertex="1">
+          <mxGeometry height="140" width="300" x="1460" y="70" as="geometry" />
         </mxCell>
-
-        <!-- CONTAINER 5: CORE PRODUCER MICROSERVICES -->
-        <mxCell id="c4_producers" value="CORE PRODUCERS (Sistemas Origen de Eventos)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=#495057;fontStyle=1;fontSize=13;startSize=30;" vertex="1" parent="c4_boundary">
-          <mxGeometry x="40" y="560" width="1420" height="260" as="geometry" />
-        </mxCell>
-
-        <mxCell id="svc_emision" value="&lt;b&gt;Policy Emission Service&lt;/b&gt;&lt;br&gt;Publica: POLICY_EMITTED" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b7bba;strokeColor=#0e5296;fontColor=#ffffff;fontSize=11;" vertex="1" parent="c4_producers">
-          <mxGeometry x="40" y="70" width="280" height="120" as="geometry" />
-        </mxCell>
-
-        <mxCell id="svc_inspeccion" value="&lt;b&gt;Inspection Service&lt;/b&gt;&lt;br&gt;Publica: INSPECTOR_ON_WAY" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b7bba;strokeColor=#0e5296;fontColor=#ffffff;fontSize=11;" vertex="1" parent="c4_producers">
-          <mxGeometry x="400" y="70" width="280" height="120" as="geometry" />
-        </mxCell>
-
-        <mxCell id="svc_siniestros" value="&lt;b&gt;Claims &amp; Incidents Service&lt;/b&gt;&lt;br&gt;Publica: CLAIM_FILED / TOW_TRUCK" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b7bba;strokeColor=#0e5296;fontColor=#ffffff;fontSize=11;" vertex="1" parent="c4_producers">
-          <mxGeometry x="760" y="70" width="280" height="120" as="geometry" />
-        </mxCell>
-
-        <mxCell id="svc_audit" value="&lt;b&gt;Centralized Audit Consumer&lt;/b&gt;&lt;br&gt;Ingesta trazas a OpenSearch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6c757d;strokeColor=#343a40;fontColor=#ffffff;fontSize=11;" vertex="1" parent="c4_producers">
-          <mxGeometry x="1100" y="70" width="280" height="120" as="geometry" />
-        </mxCell>
-
-        <!-- FLECHAS C4 CON DESCRIPCIÓN DE PROTOCOLOS -->
-        <mxCell id="flow1" value="Visualiza Dashboard (HTTPS)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#08427b;" edge="1" parent="c4_boundary" source="actor_user" target="c4_client">
+        <mxCell id="eyLJPpWVLhbL38D3-m8F-2" edge="1" parent="c4_boundary" source="c4_kafka" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" target="eyLJPpWVLhbL38D3-m8F-1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="flow2" value="Suscripción SSE (HTTP/2) &amp; WebSockets (TCP)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#1168bd;" edge="1" parent="c4_boundary" source="c4_client" target="c4_gateway">
+        <mxCell id="eyLJPpWVLhbL38D3-m8F-3" connectable="0" parent="eyLJPpWVLhbL38D3-m8F-2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="consume" vertex="1">
+          <mxGeometry relative="1" x="0.0738" y="9" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c4_kafka" parent="c4_boundary" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#1168bd;strokeColor=#0e5296;fontColor=#ffffff;fontSize=13;fontStyle=1;" value="&lt;b&gt;[Container: Event Streaming Platform]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Apache Kafka Event Backbone&lt;/b&gt;&lt;br&gt;&lt;i&gt;Topics: policy-events, inspection-events, claims-events&lt;/i&gt;&lt;br&gt;Almacena streams ordenados de eventos de dominio con alta concurrencia" vertex="1">
+          <mxGeometry height="160" width="340" x="870" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="c4_producers" parent="c4_boundary" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=#495057;fontStyle=1;fontSize=13;startSize=30;" value="CORE PRODUCERS (Sistemas Origen de Eventos)" vertex="1">
+          <mxGeometry height="380" width="1420" x="40" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="svc_emision" parent="c4_producers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b7bba;strokeColor=#0e5296;fontColor=#ffffff;fontSize=11;" value="&lt;b&gt;Policy Emission Service&lt;/b&gt;&lt;br&gt;Publica: POLICY_EMITTED" vertex="1">
+          <mxGeometry height="120" width="280" x="10" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="svc_inspeccion" parent="c4_producers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b7bba;strokeColor=#0e5296;fontColor=#ffffff;fontSize=11;" value="&lt;b&gt;Inspection Service&lt;/b&gt;&lt;br&gt;Publica: INSPECTOR_ON_WAY" vertex="1">
+          <mxGeometry height="120" width="280" x="380" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="svc_audit" parent="c4_producers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6c757d;strokeColor=#343a40;fontColor=#ffffff;fontSize=11;" value="&lt;b&gt;Centralized Audit Consumer&lt;/b&gt;&lt;br&gt;Ingesta trazas a OpenSearch" vertex="1">
+          <mxGeometry height="120" width="280" x="1120" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="svc_siniestros" parent="c4_producers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b7bba;strokeColor=#0e5296;fontColor=#ffffff;fontSize=11;" value="&lt;b&gt;Claims &amp; Incidents Service&lt;/b&gt;&lt;br&gt;Publica: CLAIM_FILED / TOW_TRUCK" vertex="1">
+          <mxGeometry height="120" width="280" x="840" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="flow1" edge="1" parent="c4_boundary" source="actor_user" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#08427b;" target="c4_client" value="Visualiza Dashboard (HTTPS)">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="flow3" value="Scale-out Backplane (Pub/Sub)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#0e5296;dashed=1;" edge="1" parent="c4_boundary" source="c4_gateway" target="c4_redis">
+        <mxCell id="flow2" edge="1" parent="c4_boundary" source="c4_client" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#1168bd;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="c4_gateway" value="Suscripción SSE (HTTP/2) &amp; WebSockets (TCP)">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="flow4" value="Consume Event Streams" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#1168bd;" edge="1" parent="c4_boundary" source="c4_kafka" target="c4_gateway">
+        <mxCell id="flow3" edge="1" parent="c4_boundary" source="c4_gateway" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#0e5296;dashed=1;" target="c4_redis" value="Scale-out Backplane (Pub/Sub)">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="flow5" value="1. Publica Eventos Emisión" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2b7bba;" edge="1" parent="c4_boundary" source="svc_emision" target="c4_kafka">
+        <mxCell id="flow4" edge="1" parent="c4_boundary" source="c4_kafka" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#1168bd;" target="c4_gateway" value="Consume Event Streams">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="flow6" value="2. Publica Eventos Inspección" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2b7bba;" edge="1" parent="c4_boundary" source="svc_inspeccion" target="c4_kafka">
+        <mxCell id="flow5" edge="1" parent="c4_boundary" source="svc_emision" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2b7bba;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="c4_kafka" value="1. Publica Eventos Emisión">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="flow7" value="3. Publica Eventos Siniestros" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2b7bba;" edge="1" parent="c4_boundary" source="svc_siniestros" target="c4_kafka">
+        <mxCell id="flow6" edge="1" parent="c4_boundary" source="svc_inspeccion" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2b7bba;entryX=0.145;entryY=1;entryDx=0;entryDy=-4.35;entryPerimeter=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="c4_kafka" value="2. Publica Eventos Inspección">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="560" y="660" />
+              <mxPoint x="919.25" y="660" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="flow7" edge="1" parent="c4_boundary" source="svc_siniestros" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2b7bba;" target="c4_kafka" value="3. Publica Eventos Siniestros">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
+        <mxCell id="eyLJPpWVLhbL38D3-m8F-1" parent="c4_boundary" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;fontStyle=1;" value="&lt;b&gt;[Container: Microservice API]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Real-Time reports&lt;/b&gt;&lt;br&gt;&lt;i&gt;.NET Core SignalR / FastAPI Hub&lt;/i&gt;&lt;br&gt;Mantiene conexiones persistentes HTTP/2 SSE y WebSockets" vertex="1">
+          <mxGeometry height="120" width="340" x="1420" y="310" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>

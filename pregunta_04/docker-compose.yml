@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  security-api:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: security_api_p4
+    ports:
+      - "8003:8000"
+    environment:
+      - JWT_SECRET_KEY=SuperSecretArchitectureKeyForJwtSigning2026!#$
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+
+  websocket-client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: websocket_client_p4
+    ports:
+      - "8084:8084"
+    depends_on:
+      - security-api
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+networks:
+  default:
+    name: net_pregunta_04

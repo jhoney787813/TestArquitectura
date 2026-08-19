@@ -1,0 +1,109 @@
+<mxfile host="app.diagrams.net" agent="Antigravity Senior Architect">
+  <diagram id="c4-security-arch" name="C4 Model Level 2 - Container Diagram Security &amp; Revocation Architecture">
+    <mxGraphModel dx="3987" dy="1140" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1100" math="0" shadow="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c4_boundary" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#000000;fontStyle=1;fontSize=16;startSize=40;dashed=1;" value="Sistema de Seguridad Multi-Protocolo &amp; Revocación en Tiempo Real (Security Boundary)" vertex="1">
+          <mxGeometry height="1160" width="2440" x="-520" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_user" parent="c4_boundary" style="html=1;whiteSpace=wrap;fillColor=#08427b;strokeColor=#073866;fontColor=#ffffff;shape=mxgraph.c4.person;align=center;fontSize=12;" value="&lt;b&gt;[Person]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Cliente / Usuario / Aplicación&lt;/b&gt;&lt;br&gt;&lt;i&gt;Autentica vía OAuth 2.0 / JWT RS256&lt;/i&gt;" vertex="1">
+          <mxGeometry height="140" width="220" x="60" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="c4_client_app" parent="c4_boundary" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;fontStyle=1;" value="&lt;b&gt;[Container: Web Application UI]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Multi-Protocol Client Dashboard&lt;/b&gt;&lt;br&gt;&lt;i&gt;http://localhost:8084 (Pestañas REST, SOAP &amp; WS)&lt;/i&gt;&lt;br&gt;Interfaz gráfica de pruebas y revocación" vertex="1">
+          <mxGeometry height="120" width="300" x="630" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="c4_idp" parent="c4_boundary" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1168bd;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;fontStyle=1;" value="&lt;b&gt;[Container: Identity Provider &amp; Auth Server]&lt;/b&gt;&lt;br&gt;&lt;b&gt;OAuth 2.0 / OIDC Identity Engine&lt;/b&gt;&lt;br&gt;&lt;i&gt;.NET 9 Clean Architecture&lt;/i&gt;&lt;br&gt;Emisión de Access Tokens JWT (RS256) y Refresh Tokens" vertex="1">
+          <mxGeometry height="120" width="340" x="1270" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="c4_redis_blacklist" parent="c4_boundary" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#85bbf0;strokeColor=#0e5296;fontColor=#000000;fontSize=12;fontStyle=1;" value="&lt;b&gt;[Container: In-Memory Datastore]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Redis Token Blacklist (Revocación)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Redis Cluster (TTL = Token Expiry)&lt;/i&gt;&lt;br&gt;Almacena JTIs revocados para verificación en &lt; 1ms" vertex="1">
+          <mxGeometry height="140" width="340" x="1850" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="c4_protocols" parent="c4_boundary" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=#495057;fontStyle=1;fontSize=14;startSize=35;" value="CAPA DE SERVICIOS Y GATEWAYS MULTI-PROTOCOLO PROTEGIDOS" vertex="1">
+          <mxGeometry height="600" width="1640" x="40" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_rest" parent="c4_protocols" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b7bba;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;" value="&lt;b&gt;[Container: REST API Gateway]&lt;/b&gt;&lt;br&gt;&lt;b&gt;REST Services (JSON over HTTP/2)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Endpoints /api/v1/policies&lt;/i&gt;&lt;br&gt;Valida Header Bearer JWT RS256 &amp; Redis Blacklist" vertex="1">
+          <mxGeometry height="130" width="440" x="80" y="125" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_soap" parent="c4_protocols" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b7bba;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;" value="&lt;b&gt;[Container: SOAP WSDL Service]&lt;/b&gt;&lt;br&gt;&lt;b&gt;SOAP Engine (WCF / SoapCore XML)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Endpoint /soap/PolicySoapService.svc&lt;/i&gt;&lt;br&gt;Valida WS-Security XML Header &amp; Redis Blacklist" vertex="1">
+          <mxGeometry height="130" width="440" x="580" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="q7LmT-4SMy8DH89OtEoj-1" edge="1" parent="c4_protocols" source="gw_ws" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1260" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gw_ws" parent="c4_protocols" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2b7bba;strokeColor=#0e5296;fontColor=#ffffff;fontSize=12;" value="&lt;b&gt;[Container: WebSockets Gateway]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Secure WebSocket Stream Handler&lt;/b&gt;&lt;br&gt;&lt;i&gt;Endpoint ws://localhost:8003/ws/secure-stream&lt;/i&gt;&lt;br&gt;Handshake de seguridad &amp; Cierre dinámico si token se revoca" vertex="1">
+          <mxGeometry height="130" width="440" x="1140" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="c4_domain" parent="c4_protocols" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6c757d;strokeColor=#343a40;fontColor=#ffffff;fontSize=13;fontStyle=1;" value="&lt;b&gt;[Container: Clean Architecture Domain &amp; Application Core]&lt;/b&gt;&lt;br&gt;&lt;b&gt;Core Insurance Business Logic &amp; Authorization Engine (RBAC / ABAC)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Domain Entities, Use Cases, Claims Validation &amp; Token Revocation Rules&lt;/i&gt;" vertex="1">
+          <mxGeometry height="160" width="1520" x="60" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="f1" edge="1" parent="c4_boundary" source="actor_user" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#08427b;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" target="c4_client_app" value="1. Login POST /login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f2" edge="1" parent="c4_boundary" source="c4_client_app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1168bd;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" target="c4_idp" value="2. Solicita Token JWT">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f3" edge="1" parent="c4_boundary" source="c4_idp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1168bd;dashed=1;" target="c4_client_app" value="3. Emite JWT RS256 (JTI)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1040" y="110" />
+              <mxPoint x="1040" y="110" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f4" edge="1" parent="c4_boundary" source="c4_idp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#CC0000;" target="c4_redis_blacklist" value="🛑 PREGUNTA B: Revoca Token (Guarda JTI)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f5" edge="1" parent="c4_boundary" source="c4_client_app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2b7bba;exitX=0;exitY=0.25;exitDx=0;exitDy=0;" value="4a. Consumo REST (Bearer)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="320" y="110" />
+            </Array>
+            <mxPoint x="660" y="130.090909090909" as="sourcePoint" />
+            <mxPoint x="319.9999999999991" y="615" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f6" edge="1" parent="c4_boundary" source="c4_client_app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2b7bba;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="gw_soap" value="4b. Invoca SOAP (WS-Security XML)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="780" y="380.09" />
+              <mxPoint x="820" y="380.09" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f7" edge="1" parent="c4_boundary" source="c4_client_app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2b7bba;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" target="gw_ws" value="4c. Conecta WebSocket (Token)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="695.09" y="260.09" />
+              <mxPoint x="1360" y="260.09" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f8" edge="1" parent="c4_boundary" source="gw_rest" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#0e5296;dashed=1;entryX=0.145;entryY=1;entryDx=0;entryDy=-4.35;entryPerimeter=0;exitX=0.75;exitY=0;exitDx=0;exitDy=0;" target="c4_redis_blacklist" value="Check Blacklist (&lt; 1ms)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="440" y="615" />
+              <mxPoint x="440" y="320.14" />
+              <mxPoint x="1890" y="320.14" />
+              <mxPoint x="1890" y="205.71" />
+            </Array>
+            <mxPoint x="409.99999999999955" y="655" as="sourcePoint" />
+            <mxPoint x="1440" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f9" edge="1" parent="c4_boundary" source="gw_soap" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#0e5296;dashed=1;" target="c4_redis_blacklist" value="Check Blacklist (&lt; 1ms)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2160" y="730" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f10" edge="1" parent="c4_boundary" source="gw_ws" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#CC0000;" target="c4_redis_blacklist" value="Expulsa en Tiempo Real si Revocado">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
