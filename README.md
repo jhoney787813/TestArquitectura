@@ -153,8 +153,14 @@ Para facilitar la revisión por parte del comité evaluador, a continuación se 
 - 📹 **Guía Paso a Paso para Grabación de Video**: [`pregunta_07/GUIA_PRUEBA_VIDEO.md`](pregunta_07/GUIA_PRUEBA_VIDEO.md)
 - 📊 **Playbook de Diagnóstico en Kubernetes**: [`pregunta_07/kubernetes/KUBERNETES_DIAGNOSTICO.md`](pregunta_07/kubernetes/KUBERNETES_DIAGNOSTICO.md) y [`pregunta_07/kubernetes/diagnostic_commands.sh`](pregunta_07/kubernetes/diagnostic_commands.sh)
 - 🖥️ **Script CLI de Demostración Visual (Comandos vs Consultas en Vivo)**: [`pregunta_07/load_test/run_visual_demo.sh`](pregunta_07/load_test/run_visual_demo.sh)
-- 💻 **Código Fuente y Despliegue en Podman**:
-  - API CQRS & Mediator Bus (.NET 9 / FastAPI): [`pregunta_07/app/main.py`](pregunta_07/app/main.py)
+- 💻 **Código Fuente Nativo C# .NET 9**:
+  - Proyecto C# .NET 9: [`pregunta_07/app/CqrsMediatorApi.csproj`](pregunta_07/app/CqrsMediatorApi.csproj)
+  - Program.cs (.NET 9 Web API): [`pregunta_07/app/Program.cs`](pregunta_07/app/Program.cs)
+  - Dominio: [`pregunta_07/app/Domain/Entities/Policy.cs`](pregunta_07/app/Domain/Entities/Policy.cs)
+  - Commands & Handlers: [`pregunta_07/app/Application/Commands/CreatePolicyCommandHandler.cs`](pregunta_07/app/Application/Commands/CreatePolicyCommandHandler.cs)
+  - Queries & Handlers: [`pregunta_07/app/Application/Queries/GetPolicyByIdQueryHandler.cs`](pregunta_07/app/Application/Queries/GetPolicyByIdQueryHandler.cs)
+  - Pipeline Behaviors: [`pregunta_07/app/Application/Behaviors/ValidationBehavior.cs`](pregunta_07/app/Application/Behaviors/ValidationBehavior.cs)
+  - Controller ASP.NET Core 9: [`pregunta_07/app/Controllers/PoliciesController.cs`](pregunta_07/app/Controllers/PoliciesController.cs)
   - Orquestador Compose: [`pregunta_07/docker-compose.yml`](pregunta_07/docker-compose.yml)
 
 ---

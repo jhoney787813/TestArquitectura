@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Script de Demostración Visual e Interactiva - Ejercicio 7 (CQRS & Mediator Pattern)
+# Script de Demostración Visual e Interactiva - Ejercicio 7 (CQRS & Mediator Pattern .NET 9)
 
 echo "=========================================================================="
 echo "    🔀 DEMOSTRACIÓN DE PATRÓN CQRS Y MEDIATOR (.NET 9 CLEAN ARCHITECTURE)"
@@ -24,7 +24,7 @@ opt = "$OPTION"
 
 if opt == "1":
     print("\n" + "="*75)
-    print(" ✍️ DEMO 1: EJECUCIÓN DE COMMANDS (PILA DE ESCRITURA MEDIATR)")
+    print(" ✍️ DEMO 1: EJECUCIÓN DE COMMANDS (PILA DE ESCRITURA MEDIATR .NET 9)")
     print("="*75)
     
     print("\n1. Probando Command con Payload Inválido (Monto = 0):")
@@ -34,7 +34,7 @@ if opt == "1":
         "insured_email": "jhoney7878@gmail.com",
         "amount": 0
     }
-    r1 = requests.post(f"{BASE_URL}/api/v1/commands/policies/create", json=cmd_invalid)
+    r1 = requests.post(f"{BASE_URL}/api/v1/policies/commands/create", json=cmd_invalid)
     print(f"   Status HTTP: {r1.status_code} (ValidationBehavior -> 422 Unprocessable Entity)")
     print(f"   Body: {r1.text}")
 
@@ -45,7 +45,7 @@ if opt == "1":
         "insured_email": "jhoney7878@gmail.com",
         "amount": 4500.00
     }
-    r2 = requests.post(f"{BASE_URL}/api/v1/commands/policies/create", json=cmd_valid)
+    r2 = requests.post(f"{BASE_URL}/api/v1/policies/commands/create", json=cmd_valid)
     print(f"   Status HTTP: {r2.status_code}")
     print(f"   Respuesta: {json.dumps(r2.json(), indent=2)}")
 
@@ -55,7 +55,7 @@ elif opt == "2":
     print("="*75)
     
     # Primero crear una póliza
-    r_create = requests.post(f"{BASE_URL}/api/v1/commands/policies/create", json={
+    r_create = requests.post(f"{BASE_URL}/api/v1/policies/commands/create", json={
         "policy_type": "HOGAR",
         "insured_name": "Cliente Ejemplo",
         "insured_email": "cliente@seguros.com",
@@ -64,7 +64,7 @@ elif opt == "2":
     policy_id = r_create["policy_id"]
     
     print(f"\nConsultando Query 'GetPolicyByIdQuery' para ID '{policy_id}':")
-    r_query = requests.get(f"{BASE_URL}/api/v1/queries/policies/{policy_id}")
+    r_query = requests.get(f"{BASE_URL}/api/v1/policies/queries/{policy_id}")
     print(f" HTTP Status: {r_query.status_code}")
     print(f" Proyección Read Model (Respuesta < 2ms):")
     print(json.dumps(r_query.json(), indent=2))
@@ -75,7 +75,7 @@ elif opt == "3":
     print("="*75)
     
     print("\n[PASO 1] Ejecutando 'CreatePolicyCommand':")
-    r1 = requests.post(f"{BASE_URL}/api/v1/commands/policies/create", json={
+    r1 = requests.post(f"{BASE_URL}/api/v1/policies/commands/create", json={
         "policy_type": "SALUD",
         "insured_name": "Jhon (Arquitecto de Software)",
         "insured_email": "jhoney7878@gmail.com",
@@ -85,18 +85,18 @@ elif opt == "3":
     print(f" Póliza creada con ID: {pid} (Estado inicial: DRAFT)")
 
     print(f"\n[PASO 2] Consultando estado previo en el Read Model ('GetPolicyByIdQuery'):")
-    r2 = requests.get(f"{BASE_URL}/api/v1/queries/policies/{pid}").json()
+    r2 = requests.get(f"{BASE_URL}/api/v1/policies/queries/{pid}").json()
     print(f" Estado en Read Model: {r2['data']['status']}")
 
     print(f"\n[PASO 3] Ejecutando comando de emisión 'EmitPolicyCommand':")
-    r3 = requests.post(f"{BASE_URL}/api/v1/commands/policies/emit", json={
+    r3 = requests.post(f"{BASE_URL}/api/v1/policies/commands/emit", json={
         "policy_id": pid,
         "payment_reference": "PAY-REF-998811"
     }).json()
     print(f" Resultado Emisión: {r3['status']} -> Póliza {pid} ahora en ACTIVE")
 
     print(f"\n[PASO 4] Consultando estado final actualizado en Read Model:")
-    r4 = requests.get(f"{BASE_URL}/api/v1/queries/policies/{pid}").json()
+    r4 = requests.get(f"{BASE_URL}/api/v1/policies/queries/{pid}").json()
     print(f" Estado Final en Read Model: {r4['data']['status']} | Referencia Pago: {r4['data']['payment_ref']}")
 
 EOF
